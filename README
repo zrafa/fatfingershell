@@ -1,0 +1,195 @@
+FatFingerShell virtual terminal
+===============================
+
+2009 - Rafael Ignacio Zurita <rizurita@yahoo.com>
+
+
+It is a virtual terminal for Openmoko, with a complete fullscreen keyboard,
+and sound/screen/vibrator feedback.
+
+You can set the colors and the transparency, set new keyboard layouts (hard yet)
+and replace the sounds.
+
+The fullscreen keyboard aims to be complete and useful for bash, vi and 
+common console tools, like top, mocp, mplayer, mc, gnu tools, etc. Moreover
+it is comfortable for fat fingers.
+
+Also, if we write easy-to-use scripts to call or sms we would be able to use
+a shell for all the functions with an Openmoko mobile phone.
+
+
+Features
+--------
+
+ - fullscreen and useful keyboard for bash/vi and other console tools
+ - big keys
+ - sound, screen and vibration feedback for keys pressed
+ - color settings for layers (edit colors.cfg)
+ - configuration files for keyboard layouts (so users can make their own
+   layouts)
+ - scroll
+ - all the useful shell/vi keys are on the first layout
+ 
+
+How to install and test
+=======================
+			
+opkg install http://ffs.projects.openmoko.org/fatfingershell_0.2_armv4t.ipk 
+
+Just tap in the fatfingershell icon. Or run /usr/bin/fatfingershell.sh
+
+For exit, just exit the shell (whit the shell command "exit" or CTRL+D for example).
+Fn key changes the keyboard layout.
+CTRL+, and CTRL+. to do scroll up/down.
+
+
+Running on console
+------------------
+cd /var/gamerunner/usr/share/fatfingershell
+
+export SDL_VIDEODRIVER=fbcon
+export SDL_VIDEO_FBCON_ROTATION=CCW
+
+/var/gamerunner/usr/bin/fatfingershell -e /bin/bash
+
+Running on X
+------------
+
+
+Sound and Vibration
+-------------------
+
+To disable vibration, modify /usr/bin/fatfingershell.sh and remove the -v argument.
+
+If you want sound, modify /usr/bin/fatfingershell.sh and add the -s argument.
+
+If you have problems with sound, try to kill other applications
+using the sound device (check with lsof -n | egrep "dsp|snd"). 
+Maybe you need to load the oss emulation module as well. You can do that with:
+modprobe snd_pcm_oss ; modprobe snd_mixer_oss
+
+
+Some Tips, or if there are problems
+-----------------------------------
+
+In some distributions, ncurses apps do not look well (top, mc, mocp)
+with fatfingershell. You need to set TERM=vt100. From fatfingershell you can
+run :
+export TERM=vt100
+or add "export TERM=vt100" into ~/.bashrc, or in your specific shell rc file.
+
+You also would like to set utf8 as locale (if you see ugly frames,
+or weird locations for labels in ncurses apps). Check LC_ALL. Maybe you need
+to run :
+export LC_ALL=utf-8
+
+If you are a really good geek, you would like install bash as well, and then,
+set -o vi :-)
+
+If you want to test other configured colors :
+- replace colors.cfg with colors.cfg.example2 
+- edit fatfingershell.sh : replace the "./fatfingershell -e bash" with
+  ./fatfingershell -d -e bash
+or just edit colors.cfg and set your prefered colors.
+
+
+Configuration
+=============
+
+This fat finger shell has several configuration files.
+
+keyboard.cfg and keyboard2.cfg 
+------------------------------
+
+These files are very similar, and both of them set
+the location on screen of every key.
+
+The format is:
+
+x1 y1 x2 y2 key capital-key sound-number
+
+The idea is this:
+x1, y1, x2 and y2 are the two coordinates of the key, so if you want
+to modify the layout you can use gimp to modify the bitmap and then
+you need to modify these keyboard.cfg and keyboard1.cfg configuration
+files.
+
+key and capital-key are the symbols for the pressed key. These symbols are
+sent to shell. For example "e E". capital-key is the SHIF+key or CAPS-LOCK+key.
+
+sound-number is a sound for the key pressed/released. There are four
+sounds. If you check the original configuration files the sounds are
+differents for neighbor keys. so you can recognize if you press the proper
+key or not. Of course, you need to listen for a while the different sounds
+for every key.
+
+
+colors.cfg
+----------
+
+This configuration file set the colors for the middle layer and uppermost
+layer (font).
+
+The file has two lines. Each line has four values (integer 0-255). Format:
+
+red-value green-value blue-value tranparency
+red-value green-value blue-value tranparency
+
+
+The first line is for the middle layer. The second line is for the uppermost
+layer (font).
+
+Examples:
+
+0 0 0 100
+26 160 26 255
+(green font, dark gray middle layer. Nice contrast with default background 
+keyboard layout.)
+
+228 223 145 200
+0 0 0 255
+(black font, beige middle layer. Nice contrast with black&white background
+keyboard layout.)
+
+
+Keyboard layout
+---------------
+
+There are two background keyboard layouts to choose. The layouts are identical
+but the default uses gray&black colors and the second one black&white.
+
+If you want to use black&white use the "-d" command line argument for the binary.
+
+
+TODO (and bugs to fix)
+======================
+
+- Arrow keys
+- Avoid "export TERM=vt100"
+- Add an option to choose the terminal size (80x24, 90x30, etc)
+- Write tiny and cool scripts to do, from shell, calls/sms, etc.
+
+
+Source Code
+===========
+
+http://ffs.projects.openmoko.org/fatfingershell_0.2.tar.gz
+
+
+Notes
+=====
+
+This software uses the source code of :
+- xvt
+- SDL_terminal
+
+And the next libraries : 
+- SDL
+- SDL_Mixer
+- SDL_ttf
+- libexpect5.43.so
+- libtk8.4.so
+- libtcl8.4.so
+
+The original libSDL_terminal was modified. Commented the "ttfwasinit()" call
+because it gives an exception float when running.

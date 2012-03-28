@@ -1,0 +1,43 @@
+
+- que el fondo se oscurezca cuando esta oscioso.. y se pueda ver mejor 
+  la terminal
+
+- que haya vibracion feedback cuando se presiona una tecla
+
+- scroll [DONE creo]
+
+- performance
+
+Codigo para vibracion :
+
+Gracias a  Aapo Rantalainen
+//Vibrarion
+#include <pthread.h>   //thread
+#include <fstream>     //file handling
+#include <iostream>   //file handling
+#include <unistd.h>   //sleep
+using namespace std;
+
+void *vibration(void *arg)
+    {
+    char power[5]="100\n";
+    int duration = 300; /* in milliseconds */
+
+    char FileName[44]="/sys/class/leds/neo1973:vibrator/brightness";
+    ofstream file_handle(FileName, ios::out);
+    file_handle << power ;
+    file_handle.flush();
+
+    usleep(duration *1000);
+
+    file_handle << "0\n" ;
+    file_handle.close();
+    return NULL;
+    }
+
+
+and somewhere else
+     //Do some vibration
+      pthread_t pth;  /*thread*/
+      pthread_create(&pth,NULL,vibration,NULL);
+

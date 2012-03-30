@@ -158,102 +158,9 @@ struct keymapst {
 	struct keystringst km_alt;	/* The alternative string */
 };
 
-/*  Table of function key mappings
- */
-static struct keymapst func_key_table[] = {
-	{XK_F1,		{KS_TYPE_XTERM,11},	{KS_TYPE_SUN,224}},
-	{XK_F2,		{KS_TYPE_XTERM,12},	{KS_TYPE_SUN,225}},
-	{XK_F3,		{KS_TYPE_XTERM,13},	{KS_TYPE_SUN,226}},
-	{XK_F4,		{KS_TYPE_XTERM,14},	{KS_TYPE_SUN,227}},
-	{XK_F5,		{KS_TYPE_XTERM,15},	{KS_TYPE_SUN,228}},
-	{XK_F6,		{KS_TYPE_XTERM,17},	{KS_TYPE_SUN,229}},
-	{XK_F7,		{KS_TYPE_XTERM,18},	{KS_TYPE_SUN,230}},
-	{XK_F8,		{KS_TYPE_XTERM,19},	{KS_TYPE_SUN,231}},
-	{XK_F9,		{KS_TYPE_XTERM,20},	{KS_TYPE_SUN,232}},
-	{XK_F10,	{KS_TYPE_XTERM,21},	{KS_TYPE_SUN,233}},
-	{XK_F11,	{KS_TYPE_XTERM,23},	{KS_TYPE_SUN,192}},
-	{XK_F12,	{KS_TYPE_XTERM,24},	{KS_TYPE_SUN,193}},
-	{XK_F13,	{KS_TYPE_XTERM,25},	{KS_TYPE_SUN,194}},
-	{XK_F14,	{KS_TYPE_XTERM,26},	{KS_TYPE_SUN,195}},
-	{XK_F15,	{KS_TYPE_XTERM,28},	{KS_TYPE_SUN,196}},
-	{XK_F16,	{KS_TYPE_XTERM,29},	{KS_TYPE_SUN,197}},
-	{XK_F17,	{KS_TYPE_XTERM,31},	{KS_TYPE_SUN,198}},
-	{XK_F18,	{KS_TYPE_XTERM,32},	{KS_TYPE_SUN,199}},
-	{XK_F19,	{KS_TYPE_XTERM,33},	{KS_TYPE_SUN,200}},
-	{XK_F20,	{KS_TYPE_XTERM,34},	{KS_TYPE_SUN,201}},
-	{XK_F21,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,208}},
-	{XK_F22,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,209}},
-	{XK_F23,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,210}},
-	{XK_F24,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,211}},
-	{XK_F25,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,212}},
-	{XK_F26,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,213}},
-	{XK_F27,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,214}},
-	{XK_F28,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,215}},
-	{XK_F29,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,216}},
-	{XK_F30,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,217}},
-	{XK_F31,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,218}},
-	{XK_F32,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,219}},
-	{XK_F33,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,220}},
-	{XK_F34,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,221}},
-	{XK_F35,	{KS_TYPE_NONE,0},	{KS_TYPE_SUN,222}},
-	{XK_Find,	{KS_TYPE_XTERM,1},	{KS_TYPE_SUN,1}},
-	{XK_Insert,	{KS_TYPE_XTERM,2},	{KS_TYPE_SUN,2}},
-	{XK_Delete,	{KS_TYPE_VT220,3},	{KS_TYPE_SUN,3}},
-	{XK_BackSpace,	{KS_TYPE_CHAR,127},	{KS_TYPE_SUN,3}},
-	{XK_Select,	{KS_TYPE_XTERM,4},	{KS_TYPE_SUN,4}},
-	{XK_Prior,	{KS_TYPE_XTERM,5},	{KS_TYPE_SUN,5}},
-	{XK_Next,	{KS_TYPE_XTERM,6},	{KS_TYPE_SUN,6}},
-	{XK_Help,	{KS_TYPE_XTERM,28},	{KS_TYPE_SUN,196}},
-	{XK_Menu,	{KS_TYPE_XTERM,29},	{KS_TYPE_SUN,197}},
-	{0,		{KS_TYPE_NONE,0},	{KS_TYPE_NONE,0}}
-};
-
-/*  PC keys and VT100 keypad function keys
- */
-static struct keymapst other_key_table[]={
-	{ XK_Up,	{KS_TYPE_NONAPP,'A'},	{KS_TYPE_APPKEY,'A'}},
-	{ XK_Down,	{KS_TYPE_NONAPP,'B'},	{KS_TYPE_APPKEY,'B'}},
-	{ XK_Right,	{KS_TYPE_NONAPP,'C'},	{KS_TYPE_APPKEY,'C'}},
-	{ XK_Left,	{KS_TYPE_NONAPP,'D'},	{KS_TYPE_APPKEY,'D'}},
-	{ XK_Home,	{KS_TYPE_NONAPP,'h'},	{KS_TYPE_APPKEY,'h'}},
-	{ XK_End,	{KS_TYPE_NONAPP,'\0'},	{KS_TYPE_APPKEY,'\0'}},
-	{ XK_KP_F1,	{KS_TYPE_APPKEY,'P'},	{KS_TYPE_APPKEY,'P'}},
-	{ XK_KP_F2,	{KS_TYPE_APPKEY,'Q'},	{KS_TYPE_APPKEY,'Q'}},
-	{ XK_KP_F3,	{KS_TYPE_APPKEY,'R'},	{KS_TYPE_APPKEY,'R'}},
-	{ XK_KP_F4,	{KS_TYPE_APPKEY,'S'},	{KS_TYPE_APPKEY,'S'}},
-	{0,		{KS_TYPE_NONE,0},	{KS_TYPE_NONE,0}}
-};
-
-/*  VT100 numeric keypad keys
- */
-static struct keymapst kp_key_table[]={
-	{ XK_KP_0,	{KS_TYPE_CHAR,'0'},	{KS_TYPE_APPKEY,'p'}},
-	{ XK_KP_1,	{KS_TYPE_CHAR,'1'},	{KS_TYPE_APPKEY,'q'}},
-	{ XK_KP_2,	{KS_TYPE_CHAR,'2'},	{KS_TYPE_APPKEY,'r'}},
-	{ XK_KP_3,	{KS_TYPE_CHAR,'3'},	{KS_TYPE_APPKEY,'s'}},
-	{ XK_KP_4,	{KS_TYPE_CHAR,'4'},	{KS_TYPE_APPKEY,'t'}},
-	{ XK_KP_5,	{KS_TYPE_CHAR,'5'},	{KS_TYPE_APPKEY,'u'}},
-	{ XK_KP_6,	{KS_TYPE_CHAR,'6'},	{KS_TYPE_APPKEY,'v'}},
-	{ XK_KP_7,	{KS_TYPE_CHAR,'7'},	{KS_TYPE_APPKEY,'w'}},
-	{ XK_KP_8,	{KS_TYPE_CHAR,'8'},	{KS_TYPE_APPKEY,'x'}},
-	{ XK_KP_9,	{KS_TYPE_CHAR,'9'},	{KS_TYPE_APPKEY,'y'}},
-	{ XK_KP_Add,	{KS_TYPE_CHAR,'+'},	{KS_TYPE_APPKEY,'k'}},
-	{ XK_KP_Subtract,{KS_TYPE_CHAR,'-'},	{KS_TYPE_APPKEY,'m'}},
-	{ XK_KP_Multiply,{KS_TYPE_CHAR,'*'},	{KS_TYPE_APPKEY,'j'}},
-	{ XK_KP_Divide,	{KS_TYPE_CHAR,'/'},	{KS_TYPE_APPKEY,'o'}},
-	{ XK_KP_Separator,{KS_TYPE_CHAR,','},	{KS_TYPE_APPKEY,'l'}},
-	{ XK_KP_Decimal,{KS_TYPE_CHAR,'.'},	{KS_TYPE_APPKEY,'n'}},
-	{ XK_KP_Enter,	{KS_TYPE_CHAR,'\r'},	{KS_TYPE_APPKEY,'M'}},
-	{ XK_KP_Space,	{KS_TYPE_CHAR,' '},	{KS_TYPE_APPKEY,' '}},
-	{ XK_KP_Tab,	{KS_TYPE_CHAR,'\t'},	{KS_TYPE_APPKEY,'I'}},
-	{0,		{KS_TYPE_NONE,0},	{KS_TYPE_NONE,0}}
-};
 
 #ifdef __STDC__
-static void push_xevent(struct xeventst *);
 static struct xeventst *pop_xevent(void);
-static unsigned char * get_keycode_value(struct keymapst *,KeySym,unsigned char *,int);
-static unsigned char *lookup_key(XEvent *,int *);
 static int get_com_char(int);
 static void push_com_char(int);
 #ifdef DEBUG
@@ -261,10 +168,7 @@ static void show_token_args(struct tokenst *);
 static void show_hex_token_args(struct tokenst *);
 #endif /* DEBUG */
 #else /* __STDC__ */
-static void push_xevent();
 static struct xeventst *pop_xevent();
-static unsigned char * get_keycode_value();
-static unsigned char *lookup_key();
 static int get_com_char();
 static void push_com_char();
 #ifdef DEBUG
@@ -335,92 +239,6 @@ int value;
 	sun_function_keys = value;
 }
 
-/*  Look up function key keycode
-*/
-static unsigned char *
-get_keycode_value(keymaptable,keysym,buf,use_alternate)
-struct keymapst *keymaptable;
-KeySym keysym;
-unsigned char *buf;
-int use_alternate;
-{
-	struct keymapst *km;
-	struct keystringst *ks;
-
-	for (km = keymaptable; km->km_keysym != 0; km++) {
-		if (km->km_keysym == keysym) {
-			ks = use_alternate ? &km->km_alt : &km->km_normal;
-			switch (ks->ks_type) {
-			    case KS_TYPE_NONE:
-				return NULL;
-			    case KS_TYPE_CHAR:
-				sprintf((char *)buf,"%c",ks->ks_value);
-				return buf;
-			    case KS_TYPE_XTERM:
-				sprintf((char *)buf,"\033[%d~",ks->ks_value);
-				return buf;
-			    case KS_TYPE_SUN:
-				sprintf((char *)buf,"\033[%dz",ks->ks_value);
-				return buf;
-			    case KS_TYPE_APPKEY:
-				sprintf((char *)buf,"\033O%c",ks->ks_value);
-				return buf;
-			    case KS_TYPE_NONAPP:
-				sprintf((char *)buf,"\033[%c",ks->ks_value);
-				return buf;
-			    case KS_TYPE_VT220:
-				sprintf((char *)buf,"\033[%d~",ks->ks_value);
-				return buf;
-			}
-		}
-	}
-	return NULL;
-}
-
-/*  Convert the keypress event into a string.
- */
-static unsigned char *
-lookup_key(ev,pcount)
-int *pcount;
-XEvent *ev;
-{
-	KeySym keysym;
-	int count;
-	static unsigned char kbuf[KBUFSIZE];
-	unsigned char *s;
-	unsigned char *str;
-
-	count = XLookupString(&ev->xkey,kbuf,KBUFSIZE,&keysym,NULL);
-	s = NULL;
-
-	if (IsFunctionKey(keysym) || IsMiscFunctionKey(keysym)
-					|| keysym == XK_Next || keysym == XK_Prior
-					|| keysym == XK_Delete || keysym == XK_BackSpace)
-		s = get_keycode_value(func_key_table,keysym,kbuf,sun_function_keys);
-	else if (IsCursorKey(keysym) || IsPFKey(keysym))
-		s = get_keycode_value(other_key_table,keysym,kbuf,app_cur_keys);
-	else
-		s = get_keycode_value(kp_key_table,keysym,kbuf,app_kp_keys);
-
-	if (s != NULL) {
-		*pcount = strlen((char *)s);
-		str = s;
-	} else {
-		str = kbuf;
-		if ((ev->xkey.state & Mod1Mask) && (count == 1)) {
-			if (1) {
-				kbuf[0] |= 0200;
-				*pcount = 1;
-			} else {
-				kbuf[1] = kbuf[0];
-				kbuf[0] = '\033';
-				*pcount = 2;
-			}
-		} else
-			*pcount = count;
-	}
-	return (str);
-}
 
 /*  Return the next input character after first passing any keyboard input
  *  to the command.  If flags & BUF_ONLY is true then only buffered characters are

@@ -83,11 +83,6 @@ struct selst {
 };
 
 #ifdef __STDC__
-static void repair_damage(void);
-static Bool grexornoex(Display *,XEvent *,char *);
-static Bool sel_pred(Display *,XEvent *,char *);
-static void send_selection(unsigned char *,int);
-static void wait_for_selection(Time);
 static void change_offset(int);
 static void paint_rval_text(unsigned char *,int,int,int,int);
 static void paint_rvec_text(unsigned char *,unsigned char *,int,int,int);
@@ -97,22 +92,10 @@ static void scroll(int,int,int);
 static void scroll1(int);
 static void home_screen(void);
 static void cursor(void);
-static void rc_to_selend(int,int,struct selst *);
-static void fix_rc(int *,int *);
 static void selend_to_rc(int *,int *,struct selst *);
-static void change_selection(struct selst *,struct selst *);
-static unsigned char *convert_line(unsigned char *,int *,int,int);
 static int selcmp(struct selst *,struct selst *);
-static void adjust_selection(struct selst *);
-static int save_selection(void);
 static void check_selection(int,int);
-static int cclass(int);
 #else /*  __STDC__ */
-static void repair_damage();
-static Bool grexornoex();
-static Bool sel_pred();
-static void send_selection();
-static void wait_for_selection();
 static void change_offset();
 static void paint_rval_text();
 static void paint_rvec_text();
@@ -122,16 +105,9 @@ static void scroll();
 static void scroll1();
 static void home_screen();
 static void cursor();
-static void rc_to_selend();
-static void fix_rc();
 static void selend_to_rc();
-static void change_selection();
-static unsigned char *convert_line();
 static int selcmp();
-static void adjust_selection();
-static int save_selection();
 static void check_selection();
-static int cclass();
 #endif /*  __STDC__ */
 
 #define MAX_WIDTH 250	/* max width of selected lines */
@@ -196,10 +172,6 @@ extern unsigned long	background;	/* background pixel value */
 extern int		reverse_wrap;	/* reverse wrap allowed */
 
 static struct selst selend1, selend2;	/* the selection endpoints */
-static struct selst selanchor;		/* the selection anchor */
-static unsigned char *selection_text = NULL;	/* text version of the current selection */
-static int selection_length;		/* length of selection text */
-static enum selunit selection_unit;	/* current unit of selection */
 
 /*  Screen state variables that are the same for both screens.
  */
@@ -1203,16 +1175,6 @@ scr_report_position()
 	cprintf("\033[%d;%dR",screen->row + 1,screen->col + 1);
 }
 
-/*  Return true if the event is a graphics exposure or noexposure.
- */
-static Bool
-grexornoex(dpy,ev,arg)
-Display *dpy;
-XEvent *ev;
-char *arg;
-{
-	return(ev->type == GraphicsExpose || ev->type == NoExpose);
-}
 
 /*  Change the value of the scrolled screen offset and repaint the screen
  */
@@ -1730,68 +1692,7 @@ cursor()
 	}
 }
 
-/*  Convert a row and column coordinates into a selection endpoint.
- */
-static void
-rc_to_selend(row,col,se)
-int row, col;
-struct selst *se;
-{
-	int i;
 
-	i = (row - offset);
-	if (i >= 0)
-		se->se_type = SCREEN;
-	else {
-		se->se_type = SAVED;
-		i = -1 - i;
-	}
-	se->se_index = i;
-	se->se_col = col;
-}
-
-/*  Fix the coordinates so that they are within the screen and do not lie within
- *  empty space.
- */
-static void
-fix_rc(rowp,colp)
-int *rowp, *colp;
-{
-	int i, len, row, col;
-	unsigned char *s;
-
-	col = *colp;
-	if (col < 0)
-		col = 0;
-	if (col > cwidth)
-		col = cwidth;
-	row = *rowp;
-	if (row < 0)
-		row = 0;
-	if (row >= cheight)
-		row = cheight - 1;
-
-	if (selection_unit == CHAR) {
-		i = (row - offset);
-		if (i >= 0) {
-			s = screen->text[i];
-			if (col > 0 && s[col - 1] < ' ')
-				while (col < cwidth && s[col] < ' ')
-					col++;
-		} else {
-			i = -1 - i;
-			len = sline[i]->sl_length;
-			s = sline[i]->sl_text;
-			if (col > 0 && s[col - 1] < ' ')
-				while (col <= len && s[col] < ' ')
-					col++;
-			if (col > len)
-				col = cwidth;
-		}
-	}
-	*colp = col;
-	*rowp = row;
-}
 
 /*  Convert the selection into a row and column.
  */
@@ -1810,118 +1711,7 @@ struct selst *se;
 		*rowp = offset - se->se_index - 1;
 }
 
-/*  Repaint the displayed selection to reflect the new value.  ose1 and ose2
- *  are assumed to represent the currently displayed selection endpoints.
- */
-static void
-change_selection(ose1,ose2)
-struct selst *ose1, *ose2;
-{
-	int rs, cs, re, ce, n;
-	int row;
-	int row1, row2;
-	int x1, x2, y;
-	struct selst *se, *se1, *se2;
 
-	if (selcmp(ose1,ose2) > 0) {
-		se = ose1;
-		ose1 = ose2;
-		ose2 = se;
-	}
-	if (selcmp(&selend1,&selend2) <= 0) {
-		se1 = &selend1;
-		se2 = &selend2;
-	} else {
-		se1 = &selend2;
-		se2 = &selend1;
-	}
-
-	if ((n = selcmp(se1,ose1)) != 0) {
-
-		/* repaint the start.
-		 */
-		if (n < 0) {
-			selend_to_rc(&rs,&cs,se1);
-			selend_to_rc(&re,&ce,ose1);
-		} else {
-			selend_to_rc(&rs,&cs,ose1);
-			selend_to_rc(&re,&ce,se1);
-		}
-		row1 = rs < 0 ? 0 : rs;
-		row2 = re >= cheight ? cheight - 1 : re;
-
-		/*  Invert the changed area
-		 */
-		for (row = row1; row <= row2; row++) {
-			y = MARGIN + row * fheight;
-			x1 = MARGIN + (row == rs ? cs * fwidth : 0);
-			x2 = MARGIN + ((row == re) ? ce : cwidth) * fwidth;
-		}
-	}
-	if ((n = selcmp(se2,ose2)) != 0) {
-
-		/* repaint the end.
-		 */
-		if (n < 0) {
-			selend_to_rc(&rs,&cs,se2);
-			selend_to_rc(&re,&ce,ose2);
-		} else {
-			selend_to_rc(&rs,&cs,ose2);
-			selend_to_rc(&re,&ce,se2);
-		}
-		row1 = rs < 0 ? 0 : rs;
-		row2 = re >= cheight ? cheight - 1 : re;
-
-		/*  Invert the changed area
-		 */
-		for (row = row1; row <= row2; row++) {
-			y = MARGIN + row * fheight;
-			x1 = MARGIN + (row == rs ? cs * fwidth : 0);
-			x2 = MARGIN + ((row == re) ? ce : cwidth) * fwidth;
-		}
-	}
-}
-
-/*  Convert a section of displayed text line into a text string suitable for pasting.
- *  *lenp is the length of the input string, i1 is index of the first character to
- *  convert and i2 is the last.  The length of the returned string is returned
- *  in *lenp;
- */
-static unsigned char *
-convert_line(str,lenp,i1,i2)
-unsigned char *str;
-int *lenp;
-int i1, i2;
-{
-	static unsigned char buf[MAX_WIDTH + 3];
-	unsigned char *s;
-	int i;
-	int newline;
-
-	newline = (i2 + 1 == cwidth) && (str[*lenp] == 0);
-	if (i2 >= *lenp)
-		i2 = *lenp - 1;
-	if (i2 - i1 >= MAX_WIDTH)
-		i2 = i1 + MAX_WIDTH;
-	while (i2 >= i1 && str[i2] == 0)
-		i2--;
-	s = buf;
-	for (i = i1; i <= i2; i++) {
-		if (str[i] >= ' ')
-			*s++ = str[i];
-		else if (str[i] == '\t') {
-			*s++ = '\t';
-			while (i < i2 && str[i + 1] == 0)
-				i++;
-		} else
-			*s++ = ' ';
-	}
-	if (newline)
-		*s++ = '\n';
-	*s = 0;
-	*lenp = s - buf;
-	return (buf);
-}
 
 /*  Compare the two selections and return -1, 0 or 1 depending on
  *  whether se2 is after, equal to or before se1.
@@ -1957,131 +1747,7 @@ struct selst *se1, *se2;
 	return(1);
 }
 
-/*  Adjust the selection to a word or line boundary. If the include endpoint is
- *  non NULL then the selection is forced to be large enough to include it.
- */
-static void
-adjust_selection(include)
-struct selst *include;
-{
-	struct selst *se1, *se2;
-	int i, len;
-	unsigned char *s;
 
-	if (selection_unit == CHAR)
-		return;
-
-	if (selcmp(&selend1,&selend2) <= 0) {
-		se1 = &selend1;
-		se2 = &selend2;
-	} else {
-		se2 = &selend1;
-		se1 = &selend2;
-	}
-	if (selection_unit == WORD) {
-		i = se1->se_col;
-		s = se1->se_type == SCREEN
-			? screen->text[se1->se_index]
-			: sline[se1->se_index]->sl_text;
-		while (i > 0 && cclass(s[i]) == cclass(s[i-1]))
-			i--;
-		se1->se_col = i;
-		i = se2->se_col;
-		if (se2 == include || selcmp(se2,&selanchor) == 0)
-			 i++;
-		if (se2->se_type == SCREEN) {
-			s = screen->text[se2->se_index];
-			len = cwidth;
-		} else {
-			s = sline[se2->se_index]->sl_text;
-			len = sline[se2->se_index]->sl_length;
-		}
-		while (i < len && cclass(s[i]) == cclass(s[i-1]))
-			i++;
-		se2->se_col = (i > len) ? cwidth : i;
-	} else if (selection_unit == LINE) {
-		se1->se_col = 0;
-		se2->se_col = cwidth;
-	}
-}
-
-/*  Convert the currently marked screen selection as a text string and save it
- *  as the current saved selection.  0 is returned for a success, -1 for a failure.
- */
-static int
-save_selection()
-{
-	unsigned char *str, *s;
-	int i, len, total, col1, col2;
-	struct selst *se1, *se2;
-	struct slinest *sl;
-
-	if (selend1.se_type == NOSEL || selend2.se_type == NOSEL)
-		return(-1);
-	if (selend1.se_type == selend2.se_type
-				&& selend1.se_index == selend2.se_index
-				&& selend1.se_col == selend2.se_col)
-		return(-1);
-
-	if (selection_text != NULL)
-		free(selection_text);
-
-	/*  Set se1 and se2 to point to the first and second selection endpoints.
-	 */
-	if (selcmp(&selend1,&selend2) <= 0) {
-		se1 = &selend1;
-		se2 = &selend2;
-	} else {
-		se2 = &selend1;
-		se1 = &selend2;
-	}
-	str = (unsigned char *)cmalloc(total = 1);
-	if (se1->se_type == SAVED) {
-		col1 = se1->se_col;
-		for (i = se1->se_index; i >= 0; i--) {
-			sl = sline[i];
-			if (se2->se_type == SAVED && se2->se_index == i) {
-				col2 = se2->se_col - 1;
-				i = 0;			/* force loop exit */
-			} else
-				col2 = cwidth - 1;
-			len = sl->sl_length;
-			s = convert_line(sl->sl_text,&len,col1,col2);
-			str = (unsigned char *)realloc(str,total + len);
-			if (str == NULL)
-				abort();
-			strncpy((char *)str + total - 1,(char *)s,len);
-			total += len;
-			col1 = 0;
-		}
-	}
-	if (se2->se_type == SCREEN) {
-		if (se1->se_type == SCREEN) {
-			i = se1->se_index;
-			col1 = se1->se_col;
-		} else {
-			i = 0;
-			col1 = 0;
-		}
-		for (; i <= se2->se_index; i++) {
-			col2 = i == se2->se_index ? se2->se_col : cwidth;
-			if (--col2 < 0)
-				break;
-			len = cwidth;
-			s = convert_line(screen->text[i],&len,col1,col2);
-			str = (unsigned char *)realloc(str,total + len);
-			if (str == NULL)
-				abort();
-			strncpy((char *)str + total - 1,(char *)s,len);
-			total += len;
-			col1 = 0;
-		}
-	}
-	str[total - 1] = 0;
-	selection_text = str;
-	selection_length = total - 1;
-	return(0);
-}
 
 /*  Determine if the current selection overlaps row1-row2 and if it does then
  *  remove it from the screen.
@@ -2108,11 +1774,3 @@ int row1,row2;
 	selend2.se_type = NOSEL;
 }
 
-/*  Return a character class for selecting words
- */
-static int
-cclass(c)
-int c;
-{
-	return (char_class[c]);
-}

@@ -40,8 +40,6 @@ char xvt_screen_c_sccsid[] = "@(#)screen.c	1.6 11/1/94 (UKC)";
 #include "screen.h"
 #include "command.h"
 #include "ttyinit.h"
-//#include "xsetup.h"
-// #include "sbar.h"
 
 #include "omshell.h"
 
@@ -272,11 +270,8 @@ int saved_lines;
 	cset = 0;
 
 /* OJO CON ESTO QUE ES SOLO UN HACK DE PRUEBA */
-	//fwidth = XTextWidth(mainfont,"M",1);
-	//fheight = mainfont->ascent + mainfont->descent;
 	fwidth = 6;
 	fheight = 13;
-	//printf("fwidth=%d, fheight=%d, mfa=%d, mfd=%d.\n", fwidth, fheight, mainfont->ascent, mainfont->descent);
 /* OJO CON ESTO QUE ES SOLO UN HACK DE PRUEBA */
 
 	scr_reset();
@@ -293,10 +288,10 @@ scr_reset()
 	unsigned char **r1, **r2, **s1, **s2;
 	struct slinest *sl;
 
-	// I ran once XGetGeometry and I am harcoded (bad) values for x, y, etc..
-	//XGetGeometry(display,vt_win,&root,&x,&y,&width,&height,&border_width,&depth);
+	/* I ran once XGetGeometry and I am harcoded (bad) values for x, y, etc..
+	 * XGetGeometry(display,vt_win,&root,&x,&y,&width,&height,&border_width,&depth);
+	 */
 	x=0; y=0; width=484; height=316; border_width=0; depth=16;
-	//printf("x=%d, y=%d, width=%d, height=%d, border_width=%d, depth=%d.\n", x, y, width, height, border_width, depth);
 
 	cw = (width - 2 * MARGIN) / fwidth;
 	ch = (height - 2 * MARGIN) / fheight;
@@ -409,7 +404,6 @@ scr_reset()
 		screen2.bmargin = cheight - 1;
 		screen2.decom = 0;
 		screen2.wrap_next = 0;
-		//scr_start_selection(0,0,CHAR);
 	}
 	tty_set_size(cwidth,cheight);
 
@@ -417,7 +411,6 @@ scr_reset()
 		screen->col = cwidth - 1;
 	if (screen->row >= cheight)
 		screen->row = cheight - 1;
-	//sbar_show(cheight + sline_top - 1, offset, offset + cheight - 1);
 	refresh(0,cheight - 1,0,cwidth - 1);
 	cursor();
 }
@@ -500,13 +493,11 @@ unsigned char *s;
 void
 scr_backspace()
 {
-	//if (screen->col == 0 && reverse_wrap && screen->row > 0) {
 	if (screen->col == 0 && 0 && screen->row > 0) {
 		cursor();
 		screen->row--;
 		screen->col = cwidth - 1;
 		cursor();
-	//} else if (screen->wrap_next && reverse_wrap)
 	} else if (screen->wrap_next && 0)
 		screen->wrap_next = 0;
 	else
@@ -518,7 +509,6 @@ scr_backspace()
 void
 scr_bell()
 {
-	//XBell(display,0);
 }
 
 /*  Change between the alternate and the main screens
@@ -680,9 +670,7 @@ int len, nlcount;
 			width = (cwidth - screen->col - n) * fwidth;
 			x2 = x + n * fwidth;
 			if (width > 0) {
-				//XCopyArea(display,vt_win,vt_win,txgc,x,y,width,fheight,x2,y);
 				Terminal_Copy_Area(x,y,width,fheight,x2,y);
-				//repair_damage();
 			}
 		}
 
@@ -842,7 +830,6 @@ int mode;
 {
 	int i, x, y, width, height;
 	unsigned char *r, *s;
-	//printf("fheight=%i,fwidth=%i\n",fheight,fwidth);
 
 	home_screen();
 	y = MARGIN + screen->row * fheight;
@@ -882,7 +869,6 @@ int mode;
 		}
 	cursor();
 	check_selection(screen->row,screen->row);
-	//XClearArea(display,vt_win,x,y,width,height,False);
 	Terminal_Clear_Area(x,y,width,height);
 	screen->wrap_next = 0;
 	cursor();
@@ -911,7 +897,6 @@ int mode;
 		}
 		check_selection(0,screen->row - 1);
 		if (height > 0) {
-			//XClearArea(display,vt_win,x,y,width,height,False);
 			Terminal_Clear_Area(x, y, width, height);
 		}
 		scr_erase_line(mode);
@@ -926,7 +911,6 @@ int mode;
 			}
 			check_selection(screen->row + 1,cheight - 1);
 			if (height > 0) {
-				//XClearArea(display,vt_win,x,y,width,height,False);
 				Terminal_Clear_Area(x, y, width, height);
 			}
 			scr_erase_line(mode);
@@ -949,10 +933,8 @@ int mode;
 			}
 		cursor();
 		check_selection(0,cheight - 1);
-		//XClearArea(display,vt_win,x,y,width,height,False);
 		Terminal_Clear_Area(x, y, width, height);
 		cursor();
-		//sbar_show(cheight + sline_top - 1, 0, cheight - 1);
 		break;
 	    default :
 		return;
@@ -1032,13 +1014,10 @@ int count;
 	x1 = x2 + count * fwidth;
 	width = (cwidth - count - screen->col) * fwidth;
 	if (width > 0) {
-		//XCopyArea(display,vt_win,vt_win,txgc,x1,y,width,fheight,x2,y);
 		Terminal_Copy_Area(x1, y, width, fheight, x2, y);
-		//repair_damage();
 	}
 	x1 = x2 + width;
 	width = count * fwidth;
-	//XClearArea(display,vt_win,x1,y,width,fheight,False);
 	Terminal_Clear_Area(x1, y, width, fheight);
 	screen->wrap_next = 0;
 	cursor();
@@ -1074,12 +1053,10 @@ int count;
 	x2 = x1 + count * fwidth;
 	width = (cwidth - count - screen->col) * fwidth;
 	if (width > 0) {
-		//XCopyArea(display,vt_win,vt_win,negc,x1,y,width,fheight,x2,y);
 		Terminal_Copy_Area(x1, y, width, fheight, x2, y);
 	}
 	x1 = MARGIN + screen->col * fwidth;
 	width = count * fwidth;
-	//XClearArea(display,vt_win,x1,y,width,fheight,False);
 	Terminal_Clear_Area(x1, y, width, fheight);
 	screen->wrap_next = 0;
 	cursor();
@@ -1200,283 +1177,14 @@ int y;
 	change_offset(n);
 }
 
-/*  Make the selection currently delimited by the selection end markers.
- */
-//void
-//scr_make_selection(time)
-//int time;
-//{
-//	if (save_selection() < 0)
-//		return;
-//
-//	XSetSelectionOwner(display,XA_PRIMARY,vt_win,(Time)time);
-//	if (XGetSelectionOwner(display,XA_PRIMARY) != vt_win)
-//		error("Could not get primary selection");
-//
-//	/*  Place in CUT_BUFFER0 for backup.
-//	 */
-//	XChangeProperty(display,DefaultRootWindow(display),XA_CUT_BUFFER0,
-//		XA_STRING,8,PropModeReplace,selection_text,selection_length);
-//}
-
-/*  respond to a request for our current selection.
- */
-//void
-//scr_send_selection(time,requestor,target,property)
-//int time, requestor, target, property;
-//{
-//	XEvent event;
-//	int status;
-//
-//	event.xselection.type = SelectionNotify;
-//	event.xselection.selection = XA_PRIMARY;
-//	event.xselection.target = XA_STRING;
-//	event.xselection.requestor = requestor;
-//	event.xselection.time = time;
-//	if (target == XA_STRING) {
-//		XChangeProperty(display,requestor,property,XA_STRING,8,PropModeReplace,
-//				selection_text,selection_length);
-//		event.xselection.property = property;
-//	} else
-//		event.xselection.property = None;
-//	status = XSendEvent(display,requestor,False,0,&event);
-//}
-
-/*  Request the current primary selection
- */
-//void
-//scr_request_selection(time,x,y)
-//int time;
-//int x, y;
-//{
-//	Atom sel_property;
-//
-//	/*  First check that the release is within the window.
-//	 */
-//	if (x < 0 || x >= pwidth || y < 0 || y >= pheight)
-//		return;
-//
-//	if (selection_text != NULL) {
-//
-//		/* The selection is internal
-//		 */
-//		send_selection(selection_text,selection_length);
-//		return;
-//	}
-//
-//	if (XGetSelectionOwner(display,XA_PRIMARY) == None) {
-//
-//		/*  No primary selection so use the cut buffer.
-//		 */
-//		Atom actual_type;
-//		int actual_format;
-//		unsigned long nitems, bytes_after, nread;
-//		unsigned char *data;
-//
-//		nread = 0;
-//		do {
-//			if (XGetWindowProperty(display,DefaultRootWindow(display),
-//			XA_CUT_BUFFER0,nread / 4,PROP_SIZE,False,
-//					XA_STRING,&actual_type,&actual_format,
-//						&nitems,&bytes_after,&data) != Success)
-//				return;
-//			if (nitems == 0 || data == NULL)
-//				return;
-//			send_selection(data,nitems);
-//			nread += nitems;
-//			XFree(data);
-//		} while (bytes_after > 0);
-//		return;
-//	}
-//
-//	sel_property = XInternAtom(display,"VT_SELECTION",False);
-//	XConvertSelection(display,XA_PRIMARY,XA_STRING,sel_property,vt_win,time);
-//	wait_for_selection(time);
-//}
-//
-///*  Send the selection to the command after converting LF to CR.
-// */
-//static void
-//send_selection(str,count)
-//unsigned char *str;
-//int count;
-//{
-//	int i;
-//
-//	for (i = 0; i < count; i++)
-//		if (str[i] == '\n')
-//			str[i] = '\r';
-//	send_string(str,count);
-//}
-//
-///*  Wait for the selection to arrive and move it to the head of the
-// *  queue.  We wait until we either get the selection or we get
-// *  keyboard input that was generated more than SEL_KEY_DEL after time.
-// */
-//static void
-//wait_for_selection(time)
-//Time time;
-//{
-//	XEvent event;
-//
-//	XPeekIfEvent(display,&event,sel_pred,(char *)&time);
-//	if (event.type == SelectionNotify) {
-//		XIfEvent(display,&event,sel_pred,NULL);
-//		XPutBackEvent(display,&event);
-//	}
-//}
-//
-///*  Predicate function used when waiting for selection events.  If arg is
-// *  NULL then we return true for Selection Notify events.  If arg is not
-// *  NULL then it is assumed to point to a time and we also return true for
-// *  keyboard events that arrive after more than SEL_KEY_DEL after the time.
-// */
-//static Bool
-//sel_pred(dpy,ev,arg)
-//Display *dpy;
-//XEvent *ev;
-//char *arg;
-//{
-//	if (ev->type == SelectionNotify)
-//		return (True);
-//	if (arg != NULL && ev->type == KeyPress &&
-//				(ev->xkey.time - *(Time *)arg) > SEL_KEY_DEL)
-//		return (True);
-//	return (False);
-//}
-//
-///*  Respond to a notification that a primary selection has been sent
-// */
-//void
-//scr_paste_primary(time,window,property)
-//int time, window, property;
-//{
-//	Atom actual_type;
-//	int actual_format;
-//	unsigned long nitems, bytes_after, nread;
-//	unsigned char *data;
-//
-//	if (property == None)
-//		return;
-//	nread = 0;
-//	do {
-//		if (XGetWindowProperty(display,window,property,nread / 4,PROP_SIZE,True,
-//				AnyPropertyType,&actual_type,&actual_format,
-//					&nitems,&bytes_after,&data) != Success)
-//			return;
-//		if (actual_type != XA_STRING)
-//			return;
-//		if (nitems == 0 || data == NULL)
-//			return;
-//		send_selection(data,nitems);
-//		nread += nitems;
-//		XFree(data);
-//	} while (bytes_after > 0);
-//}
-//
-///*  Clear the current selection.
-// */
-//void
-//scr_clear_selection()
-//{
-//	if (selection_text != NULL) {
-//		free(selection_text);
-//		selection_text = NULL;
-//		selection_length = 0;
-//	}
-//	show_selection(0,cheight - 1,0,cwidth - 1);
-//	selend1.se_type = selend2.se_type = NOSEL;
-//}
-//
-///*  Extend the selection.
-// */
-//void
-//scr_extend_selection(x,y,drag)
-//int x, y;
-//int drag;
-//{
-//	int row, col, r1, r2, c1, c2;
-//	struct selst sesave1, sesave2;
-//	struct selst *se;
-//
-//	if (selend1.se_type == NOSEL)
-//		return;
-//
-//	col = (x - MARGIN) / fwidth;
-//	row = (y - MARGIN) / fheight;
-//	fix_rc(&row,&col);
-//
-//	if (selend2.se_type == NOSEL) {
-//		rc_to_selend(row,col,&selend2);
-//		show_selection(0,cheight - 1,0,cwidth - 1);
-//		return;
-//	}
-//
-//	sesave1 = selend1;
-//	sesave2 = selend2;
-//	if (drag) {
-//
-//		/*  Anchor the start end.
-//		 */
-//		selend1 = selanchor;
-//		rc_to_selend(row,col,&selend2);
-//		adjust_selection(&selend2);
-//	} else {
-//		selend_to_rc(&r1,&c1,&selend1);
-//		selend_to_rc(&r2,&c2,&selend2);
-//
-//		/*  Determine which is the nearest endpoint.
-//		 */
-//		if (abs(r1 - row) < abs(r2 - row))
-//			se = &selend1;
-//		else if (abs(r2 - row) < abs(r1 - row))
-//			se = &selend2;
-//		else if (r1 == r2) {
-//			if (row < r1)
-//				se = (c1 < c2) ? &selend1 : &selend2;
-//			else if (row > r1)
-//				se = (c1 > c2) ? &selend1 : &selend2;
-//			else
-//				se = abs(c1 - col) < abs(c2 - col) ? &selend1 : &selend2;
-//		} else
-//			se = &selend2;
-//		rc_to_selend(row,col,se);
-//		adjust_selection(se);
-//	}
-//
-//	change_selection(&sesave1,&sesave2);
-//}
-//
-///*  start a selection using the specified unit.
-// */
-//void
-//scr_start_selection(x,y,unit)
-//int x,y;
-//enum selunit unit;
-//{
-//	int row, col;
-//
-//	show_selection(0,cheight - 1,0,cwidth - 1);
-//	col = (x - MARGIN) / fwidth;
-//	row = (y - MARGIN) / fheight;
-//	selection_unit = unit;
-//	fix_rc(&row,&col);
-//	rc_to_selend(row,col,&selanchor);
-//	selend2 = selend1 = selanchor;
-//	adjust_selection(&selend2);
-//	show_selection(0,cheight - 1,0,cwidth - 1);
-//}
-
 /*  Send the name of the current display to the command.
  */
 void
 scr_report_display()
 {
-	//char *dname;
 	char *dname="0";
 	struct utsname ut;
 
-	//dname = DisplayString(display);
 	(void)uname(&ut);
 
 	if (strncmp(dname, "unix:", 5) == 0)
@@ -1506,37 +1214,6 @@ char *arg;
 	return(ev->type == GraphicsExpose || ev->type == NoExpose);
 }
 
-/*  Check for and repair any damage after copying an area of the window.
- */
-//static void
-//repair_damage()
-//{
-//	XEvent event;
-//	int row1, row2, col1, col2;
-//
-//	do {
-//		/*  Get the next graphics exposure or noexposure event.
-//		 */
-//		XIfEvent(display,&event,grexornoex,NULL);
-//		if (event.type == NoExpose)
-//			return;
-//
-//		row1 = (event.xgraphicsexpose.y - MARGIN) / fheight;
-//		if (row1 < 0)
-//			row1 = 0;
-//		row2 = (event.xgraphicsexpose.y + event.xgraphicsexpose.height - MARGIN) / fheight;
-//		if (row2 >= cheight)
-//			row2 = cheight - 1;
-//		col1 = (event.xgraphicsexpose.x - MARGIN) / fwidth;
-//		if (col1 < 0)
-//			col1 = 0;
-//		col2 = (event.xgraphicsexpose.x + event.xgraphicsexpose.width - MARGIN) / fwidth;
-//		if (col2 >= cwidth)
-//			col2 = cwidth - 1;
-//		refresh(row1,row2,col1,col2);
-//	} while (event.xgraphicsexpose.count > 0);
-//}
-
 /*  Change the value of the scrolled screen offset and repaint the screen
  */
 static void
@@ -1561,10 +1238,8 @@ int n;
 		y1 = MARGIN;
 		y2 = y1 + d * fheight;
 		height = (cheight - d) * fheight;
-		//XCopyArea(display,vt_win,vt_win,txgc,0,y1,pwidth,height,0,y2);
 		Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
 		refresh(0,d - 1,0,cwidth - 1);
-		//repair_damage();
 	} else if (d < 0 && -d < cheight) {
 		/*  Text has moved down by less than a screen.
 		 */
@@ -1572,14 +1247,11 @@ int n;
 		y2 = MARGIN;
 		y1 = y2 + d * fheight;
 		height = (cheight - d) * fheight;
-		//XCopyArea(display,vt_win,vt_win,txgc,0,y1,pwidth,height,0,y2);
 		Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
 		refresh(cheight - d,cheight - 1,0,cwidth - 1);
-		//repair_damage();
 	} else
 		refresh(0,cheight - 1,0,cwidth - 1);
 	cursor();
-	//sbar_show(cheight + sline_top - 1, offset, offset + cheight - 1);
 }
 
 /*  Paint the text using the rendition value at the screen position.
@@ -1598,32 +1270,23 @@ int len, x, y;
 
 	if (rval & RS_RVID) {
 		inverso=1;
-		//XSetForeground(display,txgc,background);
-		//XSetBackground(display,txgc,foreground);
 	}
 	overstrike = 0;
 	if (rval & RS_BOLD) {
 		b=1;	
 		/* THe boldfont->ascent and maintfont->ascent are hardcoded BAD ! */
-		//if (boldfont != NULL) {
 		if (0) {
-			//XSetFont(display,txgc,boldfont->fid);
-			//y +=  boldfont->ascent;
 			y +=  11;/* THe boldfont->ascent and maintfont->ascent are hardcoded BAD ! */
 		} else {
 			overstrike = 1;
-			//y +=  mainfont->ascent;
 			y +=  11;/* THe boldfont->ascent and maintfont->ascent are hardcoded BAD ! */
 		}
 	} else
-		//y +=  mainfont->ascent;
 		y +=  11;/* THe boldfont->ascent and maintfont->ascent are hardcoded BAD ! */
 
 	if ((rval & CS_STYLE) == CS_USASCII) {
-		//XDrawImageString(display,vt_win,txgc,x,y,str,len);
 		TerminalDrawImageString(x,y,str,len, b, inverso, 0);
 		if (overstrike) {
-			//XDrawString(display,vt_win,txgc,x + 1,y,str,len);
 			TerminalDrawImageString(x + 1,y,str,len, b, inverso, 0);
 		}
 	} else {
@@ -1639,14 +1302,10 @@ int len, x, y;
 					buf[i] = str[i];
 		}
 
-		//XDrawImageString(display,vt_win,txgc,x,y,buf,len);
-		//TerminalDrawImageString(x,y,buf,len, b, inverso);
 		/* because now we need to print extended chars, we use str and 1 for
  		   the last argument */
 		TerminalDrawImageString(x,y,str,len, b, inverso, 1);
 		if (overstrike) {
-			//XDrawString(display,vt_win,txgc,x + 1,y,buf,len);
-			//TerminalDrawImageString(x + 1,y,buf,len, b, inverso);
 			TerminalDrawImageString(x + 1,y,str,len, b, inverso, 1);
 		}
 		free((void *)buf);
@@ -1654,15 +1313,11 @@ int len, x, y;
 
 	y++;
 	if (rval & RS_ULINE) {
-		//XDrawLine(display,vt_win,txgc,x,y,x + len * fwidth,y);
 	}
 
 	if (rval & RS_RVID) {
-		//XSetForeground(display,txgc,foreground);
-		//XSetBackground(display,txgc,background);
 	}
 	if (rval & RS_BOLD) {
-		//XSetFont(display,txgc,mainfont->fid);
 	}
 }
 
@@ -1721,7 +1376,6 @@ int row1, row2, col1, col2;
 		x2 = x1 + m * fwidth;
 		width = (col2 - col1 + 1 - m) * fwidth;
 		if (width > 0) {
-			//XClearArea(display,vt_win,x2,y1,width,fheight,False);
 			Terminal_Clear_Area(x2, y1, width, fheight);
 		}
 		y1 += fheight;
@@ -1748,7 +1402,6 @@ int row1, row2, col1, col2;
 		x2 = x1 + m * fwidth;
 		width = (col2 - col1 + 1 - m) * fwidth;
 		if (width > 0) {
-			//XClearArea(display,vt_win,x2,y1,width,fheight,False);
 			Terminal_Clear_Area(x2, y1, width, fheight);
 		}
 		y1 += fheight;
@@ -1812,7 +1465,6 @@ int row1, row2, col1, col2;
 		x1 = MARGIN + (row == sr ? sc : col1) * fwidth;
 		x2 = MARGIN + ((row == er) ? ec : col2) * fwidth;
 		if (x2 > x1) {
-			// XFillRectangle(display,vt_win,hlgc,x1,y,x2 - x1,fheight);
 		}
 	}
 }
@@ -1889,7 +1541,6 @@ int row1, row2, count;
 		sline_top += count;
 		if (sline_top > sline_max)
 			sline_top = sline_max;
-		//sbar_show(cheight + sline_top - 1, offset, offset + cheight - 1);
 	}
 
 	if (count > 0) {
@@ -1924,13 +1575,10 @@ int row1, row2, count;
 			y2 = MARGIN + row1 * fheight;
 			y1 = y2 + count * fheight;
 			height = (row2 - row1 - count) * fheight;
-			//XCopyArea(display,vt_win,vt_win,txgc,0,y1,pwidth,height,0,y2);
 			Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
-			//repair_damage();
 		}
 		height = count * fheight;
 		y1 = MARGIN + (row2 - count) * fheight;
-		//XClearArea(display,vt_win,0,y1,pwidth,height,False);
 		Terminal_Clear_Area(0, y1, pwidth, height);
 	}
 	if (count < 0) {
@@ -1966,13 +1614,10 @@ int row1, row2, count;
 			y1 = MARGIN + row1 * fheight;
 			y2 = y1 + count * fheight;
 			height = (row2 - row1 - count) * fheight;
-			//XCopyArea(display,vt_win,vt_win,txgc,0,y1,pwidth,height,0,y2);
 			Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
-			//repair_damage();
 		}
 		height = count * fheight;
 		y1 = MARGIN + row1 * fheight;
-		//XClearArea(display,vt_win,0,y1,pwidth,height,False);
 		Terminal_Clear_Area(0, y1, pwidth, height);
 	}
 }
@@ -2060,7 +1705,6 @@ home_screen()
 		offset = 0;
 		refresh(0,cheight - 1,0,cwidth - 1);
 		cursor();
-		//sbar_show(cheight + sline_top - 1, 0, cheight - 1);
 	}
 }
 
@@ -2072,22 +1716,17 @@ cursor()
 	int x, y;
 
 /* solo comento para hacer una prueba */
-//	if (offset > 0)
-//		return;
+/*	if (offset > 0)
+ *		return;
+ */
 
 	/* CORREGIR PARA QUE SE VEA EL CURSOR */
-	// printf("x=%d, y=%d, fwidth=%d, fheigth=%d, screen->col=%d, screen->row=%d, MARGIN=%d\n", x, y, fwidth, fheight, screen->col, screen->row, MARGIN);
 	x = MARGIN + fwidth * screen->col;
 	y = MARGIN + fheight * screen->row;
-	//XFillRectangle(display,vt_win,cugc,x,y,fwidth,fheight);
 	TerminalCursor(x,y,fwidth,fheight);
-	//TerminalFillRectangle(x,y);
 	/* fin de CORREGIR PARA QUE SE VEA EL CURSOR */
 
 	if (focus == 0) {
-		//XFillRectangle(display,vt_win,cugc,x + 1,y + 1,fwidth - 2,fheight - 2);
-		/* por ahora comentamos la linea debajo (hasta comprobar su utilidad) */
-		//TerminalFillRectangle(x + 1,y + 1);
 	}
 }
 
@@ -2217,7 +1856,6 @@ struct selst *ose1, *ose2;
 			y = MARGIN + row * fheight;
 			x1 = MARGIN + (row == rs ? cs * fwidth : 0);
 			x2 = MARGIN + ((row == re) ? ce : cwidth) * fwidth;
-			// XFillRectangle(display,vt_win,hlgc,x1,y,x2 - x1,fheight);
 		}
 	}
 	if ((n = selcmp(se2,ose2)) != 0) {
@@ -2240,7 +1878,6 @@ struct selst *ose1, *ose2;
 			y = MARGIN + row * fheight;
 			x1 = MARGIN + (row == rs ? cs * fwidth : 0);
 			x2 = MARGIN + ((row == re) ? ce : cwidth) * fwidth;
-			// XFillRectangle(display,vt_win,hlgc,x1,y,x2 - x1,fheight);
 		}
 	}
 }

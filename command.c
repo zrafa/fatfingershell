@@ -51,7 +51,6 @@ char xvt_command_c_sccsid[] = "@(#)command.c	1.3 9/12/93 (UKC)";
 #include "omshell.h"
 #include "ttyinit.h"
 #include "screen.h"
-//#include "xsetup.h"
 
 #ifdef AIX3
 #include <sys/select.h>
@@ -90,7 +89,6 @@ static int x_fd;	/* file descriptor of the X server connection */
 static int app_cur_keys = 0;/* flag to say cursor keys are in application mode */
 static int app_kp_keys = 0;	/* flag to set application keypad keys */
 static int sun_function_keys = 0;	/* flag set to use Sun function key mapping */
-static Atom wm_del_win;
 
 static unsigned char *send_buf = NULL;	/* characters waiting to be sent to the command */
 static unsigned char *send_nxt = NULL;	/* next character to be sent */
@@ -275,19 +273,6 @@ static void show_hex_token_args();
 #endif /* DEBUG */
 #endif /* __STDC__ */
 
-/*  Push a mini X event onto the queue
- */
-static void
-push_xevent(xe)
-struct xeventst *xe;
-{
-	xe->xe_next = xevent_start;
-	xe->xe_prev = NULL;
-	if (xe->xe_next != NULL)
-		xe->xe_next->xe_prev = xe;
-	else
-		xevent_last = xe;
-}
 
 static struct xeventst *
 pop_xevent()
@@ -314,16 +299,11 @@ init_command(command,argv)
 char *command;
 char **argv;
 {
-	/*  Enable the delete window protocol.
-	 */
-	//wm_del_win = XInternAtom(display,"WM_DELETE_WINDOW",False);
-	//XSetWMProtocols(display,main_win,&wm_del_win,1);
 
 	if ((comm_fd = run_command(command,argv)) < 0) {
 		error("Quitting");
 		quit(1);
 	}
-	//x_fd = XConnectionNumber(display);
 	com_buf_next = com_buf_top = com_buf;
 	com_stack_top = com_stack;
 }
@@ -428,7 +408,6 @@ XEvent *ev;
 	} else {
 		str = kbuf;
 		if ((ev->xkey.state & Mod1Mask) && (count == 1)) {
-			//if (is_eightbit()) {
 			if (1) {
 				kbuf[0] |= 0200;
 				*pcount = 1;
@@ -455,8 +434,7 @@ int flags;
 {
 	fd_set in_fdset, out_fdset;
 	unsigned char *letra;
-	int count, sv;
-	// unsigned char mask = is_eightbit() ? 0xff : 0x7f;
+	int count;
 	unsigned char mask = 1 ? 0xff : 0x7f;
 	extern int errno;
 
@@ -472,9 +450,7 @@ int flags;
 	int k; /* for sdl */
 	int count2;
 	for (;;) {
-//		printf("111111\n");
 		FD_ZERO(&in_fdset);
-//		while (XPending(display) == 0) {
 			if (FD_ISSET(x_fd,&in_fdset))
 				/*  If we get to this point something is wrong
 				 *  because there is X input available but no
@@ -487,16 +463,6 @@ int flags;
 			FD_ZERO(&out_fdset);
 			if (send_count > 0)
 				FD_SET(comm_fd,&out_fdset);
-//			printf("222222222111111\n");
-//			do
-//				sv = select(fd_width,&in_fdset,&out_fdset,NULL,NULL);
-//			while (sv < 0 && errno == EINTR);
-//			printf("222222222111111\n");
-/*			if (sv < 0) {
-				error("select failed");
-				quit(-1);
-			} */
-//			printf("222222222111111\n");
 
 			if (FD_ISSET(comm_fd,&out_fdset)) {
 				count = send_count < 100 ? send_count : 100;
@@ -508,34 +474,17 @@ int flags;
 				send_count -= count;
 				send_nxt += count;
 			}
-//			printf("9999999999222222222111111\n");
 
 			if (FD_ISSET(comm_fd,&in_fdset)) {
-			//	break;
 			}
-//			printf("888888888888888888\n");
-
-//		}
 
 
-//		/* agregamos eventos desde el display de sdl */
-//		printf("por aca...\n");
-		//mostrar_keyboard();
-//		printf("por aca8...\n");
-//			printf("por aca...\n");
+
 			k = check_ts();
 			if (k<100)
 				keypressed(k);
 			else if (k>100) {
 				letra=keyreleased();
-//				send_string(s,1);
-//				FD_ZERO(&out_fdset);
-//				FD_SET(comm_fd,&out_fdset);
-//				do
-//					sv = select(fd_width,NULL,&out_fdset,NULL,NULL);
-//				while (sv < 0 && errno == EINTR);
-//				if (FD_ISSET(comm_fd,&out_fdset))
-					//printf("string=%s\n",letra);
 					if (((*letra) == 201) || ((*letra) == 202))
 						return (*letra);
 					else if ((*letra) != '\0')
@@ -546,74 +495,6 @@ int flags;
 		if (FD_ISSET(comm_fd,&in_fdset))
 			break;
 
-//		XNextEvent(display,&event);
-//		if (event.type == KeyPress) {
-//			s = lookup_key(&event,&count);
-//			if (count != 0)
-//				send_string(s,count);
-//		} else if (event.type == ClientMessage) {
-//			if (event.xclient.format == 32 && event.xclient.data.l[0] == wm_del_win)
-//				quit(0);
-//		} else if (event.type == MappingNotify) {
-//			XRefreshKeyboardMapping(&event.xmapping);
-//		} else if (event.type == SelectionRequest) {
-//			xe = (struct xeventst *)cmalloc(sizeof(struct xeventst));
-//			xe->xe_type = event.type;
-//			xe->xe_window = event.xselectionrequest.owner;
-//			xe->xe_time = event.xselectionrequest.time;
-//			xe->xe_requestor = event.xselectionrequest.requestor;
-//			xe->xe_target = event.xselectionrequest.target;
-//			xe->xe_property = event.xselectionrequest.property;
-//			push_xevent(xe);
-//			if (flags & GET_XEVENTS)
-//				return(GCC_NULL);
-//		} else if (event.type == SelectionNotify) {
-//			xe = (struct xeventst *)cmalloc(sizeof(struct xeventst));
-//			xe->xe_type = event.type;
-//			xe->xe_time = event.xselection.time;
-//			xe->xe_requestor = event.xselection.requestor;
-//			xe->xe_property = event.xselection.property;
-//			push_xevent(xe);
-//			if (flags & GET_XEVENTS)
-//				return(GCC_NULL);
-//		} else if (event.type == FocusIn || event.type == FocusOut) {
-//			if (event.xfocus.mode != NotifyNormal)
-//				continue;
-//			switch (event.xfocus.detail) {
-//			    case NotifyAncestor :
-//			    case NotifyInferior :
-//			    case NotifyNonlinear :
-//				break;
-//			    default :
-//				continue;
-//			}
-//			xe = (struct xeventst *)cmalloc(sizeof(struct xeventst));
-//			xe->xe_type = event.type;
-//			xe->xe_time = event.xselection.time;
-//			xe->xe_detail = event.xfocus.detail;
-//			push_xevent(xe);
-//			if (flags & GET_XEVENTS)
-//				return(GCC_NULL);
-//		} else {
-//			xe = (struct xeventst *)cmalloc(sizeof(struct xeventst));
-//			xe->xe_type = event.type;
-//			xe->xe_window = event.xany.window;
-//			if (event.type == Expose || event.type == GraphicsExpose) {
-//				xe->xe_x = event.xexpose.x;
-//				xe->xe_y = event.xexpose.y;
-//				xe->xe_width = event.xexpose.width;
-//				xe->xe_height = event.xexpose.height;
-//			} else {
-//				xe->xe_time = event.xbutton.time;
-//				xe->xe_x = event.xbutton.x;
-//				xe->xe_y = event.xbutton.y;
-//				xe->xe_state = event.xbutton.state;
-//				xe->xe_button = event.xbutton.button;
-//			}
-//			push_xevent(xe);
-//			if (flags & GET_XEVENTS)
-//				return(GCC_NULL);
-//		}
 	}
 
 	count = read(comm_fd,com_buf,COM_BUF_SIZE);
@@ -720,15 +601,6 @@ struct tokenst *tk;
 	tk->tk_type = TK_NULL;
 
 	if ((xe = pop_xevent()) != NULL) {
-		//if (xe->xe_window == vt_win)
-		//	tk->tk_region = SCREEN;
-		//else if (xe->xe_window == sb_win)
-	//		tk->tk_region = SCROLLBAR;
-	//	else if (xe->xe_window == main_win)
-	//		tk->tk_region = MAINWIN;
-	//	else
-	//		tk->tk_region = -1;
-	//	printf("tkregion=%d",tk->tk_region);
 		switch (xe->xe_type) {
 		    case EnterNotify :
 			tk->tk_type = TK_ENTRY;
@@ -785,102 +657,10 @@ struct tokenst *tk;
 			tk->tk_nargs = 4;
 			break;
 		    case ButtonPress :
-			//if (xe->xe_window == vt_win && xe->xe_state == ControlMask) {
-			//	tk->tk_type = TK_SBSWITCH;
-			//	tk->tk_nargs = 0;
-			//	break;
-			//}
-//			if (xe->xe_window == vt_win && (xe->xe_state & ControlMask) == 0) {
-//				switch (xe->xe_button) {
-//				    case Button1 :
-//					if (xe->xe_time - time2 < MP_INTERVAL) {
-//						time1 = 0;
-//						time2 = 0;
-//						tk->tk_type = TK_SELLINE;
-//					} else if (xe->xe_time - time1 < MP_INTERVAL) {
-//						time2 = xe->xe_time;
-//						tk->tk_type = TK_SELWORD;
-//					} else {
-//						time1 = xe->xe_time;
-//						tk->tk_type = TK_SELSTART;
-//					}
-//					break;
-//				    case Button2 :
-//					tk->tk_type = TK_NULL;
-//					break;
-//				    case Button3 :
-//					tk->tk_type = TK_SELEXTND;
-//					break;
-//				}
-//				tk->tk_arg[0] = xe->xe_x;
-//				tk->tk_arg[1] = xe->xe_y;
-//				tk->tk_nargs = 2;
-//				break;
-//			}
-//			if (xe->xe_window == sb_win) {
-//				if (xe->xe_button == Button2) {
-//					tk->tk_type = TK_SBGOTO;
-//					tk->tk_arg[0] = xe->xe_y;
-//					tk->tk_nargs = 1;
-//				}
-//			}
 			break;
 		    case ButtonRelease :
-//			if (xe->xe_window == sb_win) {
-//				switch (xe->xe_button) {
-//				    case Button1 :
-//					tk->tk_type = TK_SBUP;
-//					tk->tk_arg[0] = xe->xe_y;
-//					tk->tk_nargs = 1;
-//					break;
-//				    case Button3 :
-//					tk->tk_type = TK_SBDOWN;
-//					tk->tk_arg[0] = xe->xe_y;
-//					tk->tk_nargs = 1;
-//					break;
-//				}
-//			} else if (xe->xe_window == vt_win &&
-//						(xe->xe_state & ControlMask) == 0) {
-//				switch (xe->xe_button) {
-//				    case Button1 :
-//				    case Button3 :
-//					tk->tk_type = TK_SELECT;
-//					tk->tk_arg[0] = xe->xe_time;
-//					tk->tk_nargs = 1;
-//					break;
-//				    case Button2 :
-//					tk->tk_type = TK_SELINSRT;
-//					tk->tk_arg[0] = xe->xe_time;
-//					tk->tk_arg[1] = xe->xe_x;
-//					tk->tk_arg[2] = xe->xe_y;
-//					tk->tk_nargs = 3;
-//					break;
-//				}
-//			}
 			break;
 		    case MotionNotify :
-//			if (xe->xe_window == sb_win && (xe->xe_state & Button2Mask)) {
-//				Window root, child;
-//				int root_x, root_y, x, y;
-//				unsigned int mods;
-//
-//				//XQueryPointer(display,sb_win,&root,&child,
-//				//	&root_x,&root_y,&x,&y,&mods);
-//				//if (mods & Button2Mask) {
-//				//	tk->tk_type = TK_SBGOTO;
-//				//	tk->tk_arg[0] = y;
-//				//	tk->tk_nargs = 1;
-//				//}
-//				break;
-//			}
-//			if (xe->xe_window == vt_win && (xe->xe_state & Button1Mask) &&
-//						       !(xe->xe_state & ControlMask)) {
-//				tk->tk_type = TK_SELDRAG;
-//				tk->tk_arg[0] = xe->xe_x;
-//				tk->tk_arg[1] = xe->xe_y;
-//				tk->tk_nargs = 2;
-//				break;
-//			}
 			break;
 				
 		}

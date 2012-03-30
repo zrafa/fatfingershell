@@ -22,10 +22,9 @@
 #include <time.h>
 #include <string.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <termios.h>
 #include <sys/select.h>
-
-//#include <tcl8.4/expect.h>
 
 #include "omshell.h"
 
@@ -133,14 +132,7 @@ void Blitspecialkeycolors()
 			color = SDL_MapRGBA (scr->format, 0,255,0,0);
 			SDL_BlitSurface(bg[layout*2+1], &dst, scr, &dst);
 			TerminalBlit (kb[layout][i][0], kb[layout][i][1], w, h);
-		}/* else if (kb[layout][i][7] == 2) {
-			printf("especialcolor2\n");
-			//SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
-			color = SDL_MapRGBA (scr, 255,0,0,0);
-			//SDL_FillRect (scr, &dst, color);
-			SDL_BlitSurface(bg[layout+4], &dst, scr, &dst);
-			TerminalBlit (kb[layout][i][0], kb[layout][i][1], w, h);
-		}*/
+		}
 	}
 
 }
@@ -208,7 +200,6 @@ void TerminalDelCursor()
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
 	TerminalBlit (x1, y1,x1 + terminal->glyph_size.w, y1 + terminal->glyph_size.h);
-	//SDL_Flip(scr);
 	SDL_UpdateRect(scr, x1, y1, terminal->glyph_size.w, terminal->glyph_size.h);
 
 }
@@ -240,7 +231,6 @@ void TerminalFillRectangle (int x,int y)
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
 	TerminalBlit (x1, y1,x1 + terminal->glyph_size.w, y1 + terminal->glyph_size.h);
-	//SDL_Flip(scr);
 	SDL_UpdateRect(scr, x1, y1, terminal->glyph_size.w, terminal->glyph_size.h);
 }
 
@@ -254,7 +244,6 @@ unsigned char extended_codes[32] = { 111, 72, 72, 70, 67, 76, 111, 43,
 /*
 * TerminalDrawImageString(display,vt_win,txgc,x,y,str,len);
 */
-//static int TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int inverso, int extended)
 
 void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int inverso, int extended)
 {
@@ -292,7 +281,6 @@ void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int
 			SDL_TerminalRenderChar (terminal, 
 				x1 + i * terminal->glyph_size.w,
 				y1 - terminal->glyph_size.h +2,
-				//	y1 - terminal->glyph_size.h ,
 				linea[i]);
 		}
 	}
@@ -337,7 +325,6 @@ void Terminal_Clear_Area(int x,int y,int width,int height)
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
 	TerminalBlit (x1, y1, w1, h1);
-	//SDL_Flip(scr);
 	SDL_UpdateRect(scr, x1, y1, w1, h1);
 }
 
@@ -378,7 +365,6 @@ void Terminal_Copy_Area(int src_x, int src_y,
 
 	TerminalBlit (x2, y2+2, w1, h1);
 
-	//SDL_Flip(scr);
 	SDL_UpdateRect(scr, x2, y2+2, w1, h1);
 }
 
@@ -423,7 +409,6 @@ int tecleando = 10;
 int x1,y1;
 int kn=0, kx=0, ky=0;
 int pulsado = 0;
-//int check_ts(int n)
 int check_ts()
 {
 	int k=100; /* no key pressed */
@@ -481,7 +466,7 @@ int check_ts()
 					};
 	} else if ((tecleando>4) && pulsado) {
 		pulsado = 0;
-				k = 101;	/* key released */
+				k = 101;*/	/* key released */
 /*
 				kn=0; kx=0; ky=0;
 		}
@@ -501,13 +486,11 @@ void *teclear(void *arg)
 
 
                 event0_fd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
-                //event0_fd = open("/dev/input/event1", O_RDONLY );
         while (1) {
 
                   button=0; x=0; y=0; realx=0; realy=0;
 
                   rd = read(event0_fd, ev0, sizeof(struct input_event) * 32);
-                  //rd = read(event0_fd, ev0, sizeof(struct input_event) * 3);
 
                                 if (rd != -1) { 
                   for (i = 0; i < (rd / sizeof(struct input_event) ); i++) {
@@ -517,29 +500,18 @@ void *teclear(void *arg)
                         else if (ev0[i].type == 1 && ev0[i].code == 330) button = ev0[i].value << 2;
                         else if (ev0[i].type == 0 && ev0[i].code == 0 && ev0[i].value == 0) {
         
-				//if (x>x2) x2=x;
-				//if (y>y2) y2=y;
-				//if (x<x3) x3=x;
-				//if (y<y3) y3=y;
-			printf("x1=%i, y1=%i\n", x, y);
 				
                                 x1 = ((x-110) * 640) / (922-110);                     
                                 y1 = ((y-105) * 480) / (928-105);
 
-				//	if ((x1>=0) && (y1>=0))
-                                 //                       printf("x=%d, y=%d\n", x1, y1);
 
 
                        }
                 }
 				tecleando=0;
                 } else {
-		//	printf ("nada.....\n");
 			tecleando++;
 		}
-	//	if (no_pulsado>4) {
-	//		printf ("nada.....\n");
-	//	}
 
                 usleep(10000);
         }
@@ -553,19 +525,15 @@ void *vibration(void *arg)
 	char *power="170\n";
 	char *power1="0\n";
 	int duration = 300; /* in milliseconds */
-	//char *FileName="/sys/devices/platform/neo1973-vibrator.0/leds/neo1973\\:vibrator/brightness";
 
 	FILE *archivo;
 	for(;;) {
 		if ((vibracion) && (vibrar)) {
 
-//			vibrar = 0;
-			//archivo = fopen("/sys/devices/platform/neo1973-vibrator.0/leds/neo1973:vibrator/brightness", "w");
 			archivo = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
 			fprintf(archivo,"%s",power);
 			fclose(archivo);
 			usleep(duration *200);
-			//archivo = fopen("/sys/devices/platform/neo1973-vibrator.0/leds/neo1973:vibrator/brightness", "w");
 			archivo = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
 			fprintf(archivo,"%s",power1);
 			fclose(archivo);
@@ -713,56 +681,6 @@ void load_sounds()
 
 }
 
-//int kn=0, kx=0, ky=0;
-//
-//int check_ts()
-//{
-//	int k=100; /* no key pressed */
-//	SDL_Event evento;
-//	int mb, mx, my, i;
-//	int n=nkeys;
-//
-//
-//	while ( SDL_PollEvent(&evento) )
-//	{
-//	 	   switch (evento.type){
-//			case SDL_MOUSEBUTTONDOWN:
-//				mb=SDL_GetMouseState(&mx, &my);
-//				/* to guess where user wanted to press we modify a bit the position
-// 				 * because if the finger was the fat finger of the left hand then 
-//				 * it is very probable that the user wanted to press a bit more up
-//				 * and a bit more to the right. Check the fat finger and check where it
-//				 * touch the screen. Always the botton part of the fat finger touch
-//				 * first the screen. But we wanted to touch the screen with the part
-//				 * under the nail.
-//				 * I modify the behavior just in the middle up, where the fat finger
-//				 * must do an effort to press (and these are not in arrowhead position)
-//				 */
-//				if ((mx>250) && (mx<400) && (my<250)) {
-//				 	if (mx<320) { mx=mx+10; my=my-10; }
-//				 		else { mx=mx-10; my=my-10; } 
-//				}
-//				kx=kx+mx; ky=ky+my; kn++;
-//				mx=kx/kn; my=ky/kn;
-//				
-//				for (i=0; i<n; i++)
-//					if ((mx >= kb[layout][i][0]) && (mx <= kb[layout][i][2]) && (my >= kb[layout][i][1]) && (my <= kb[layout][i][3])) {
-//						k=i;
-//						break;
-//					};
-//				break;
-//			case SDL_MOUSEBUTTONUP:
-//				k = 101;	/* key released */
-//				kn=0; kx=0; ky=0;
-//				break;
-//		}
-//		     
-//	}
-//
-//	return k;
-//}
-
-
 void Blitnormalkey(int k)
 {
 #ifdef DEBUG
@@ -776,7 +694,6 @@ void Blitnormalkey(int k)
 	SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
 	Blitspecialkeycolors();
 	TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
-	//SDL_Flip(scr);
 	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
 
 }
@@ -818,8 +735,6 @@ char *keyreleased()
 		letra='\0';
 		layout++;
 		if (layout == 2) layout = 0;
-		//kb[layout][k][7]++;
-		//if (kb[layout][k][7]==2) kb[layout][k][7] = 0;
 		kb[0][k][7]++;
 		if (kb[0][k][7]==2) kb[0][k][7] = 0;
 		SDL_BlitSurface(bg[layout*2], NULL, scr, NULL);
@@ -828,11 +743,9 @@ char *keyreleased()
 		SDL_Flip(scr);
 	} else if ((kb[layout][k][4] == 119) && (kb[layout][k][5] == 119)) /* esc key , w=119 ascii*/
 		letra=27;
-		//quit_omshell(0);
 
 	else if ((kb[layout][k][4] == 101) && (kb[layout][k][5] == 101)) { /* ENTER key , e=101 ascii*/
 		letra='\n';
-		//TerminalDelCursor();
 	} else if ((kb[layout][k][4] == 112) && (kb[layout][k][5] == 112)) { /* SPACE key , p=112 ascii*/
 		letra=32;
 	} else if ((kb[layout][k][4] == 116) && (kb[layout][k][5] == 116)) { /* TAB key , t=116 ascii*/
@@ -891,7 +804,6 @@ char *keyreleased()
 	SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
 	Blitspecialkeycolors();
 	TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
-//	SDL_Flip(scr);
 	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
 	
 	sprintf(s,"%c",letra);
@@ -922,7 +834,6 @@ void keypressed(int k)
 		SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
 		Blitspecialkeycolors();
 		TerminalBlit(kb[layout][previouskey][0], kb[layout][previouskey][1], w, h);
-	//	SDL_Flip(scr);
 		SDL_UpdateRect(scr, kb[layout][previouskey][0], kb[layout][previouskey][1], w, h);
 	}
 	
@@ -946,7 +857,7 @@ void terminal_update()
 	printf("terminalupdate\n");
 #endif
 	int i,j;
-	char linea[1024]; //char c;
+	char linea[1024];
 
 	FD_ZERO (&rset);
 	FD_SET (fd, &rset);
@@ -957,7 +868,6 @@ void terminal_update()
 	if (select (fd + 1, &rset, NULL, NULL, &tiempo) < 0) {
 		perror ("select()");
 		ret = -1;
-		//break;
 		quit_omshell(1);
 	}
 	
@@ -966,7 +876,6 @@ void terminal_update()
 		if (i <= 0) {
 			if ((errno != EINTR) && (errno != EAGAIN)) {
 				/* just call it EOF; we seem to get EIO on EOF */
-				//break;
 				quit_omshell(1);
 			}
 		} else if (i > 0) {
@@ -1005,7 +914,6 @@ void load_kb_layout(int l, int n, const char *fn)	/* load key codes */
 	for (i=0; i<n; i++) {
 		fscanf (f, "%i %i %i %i %c %c %i", &kb[l][i][0], &kb[l][i][1], &kb[l][i][2], &kb[l][i][3], &kb[l][i][4], &kb[l][i][5], &kb[l][i][6]);
 		kb[l][i][7] = 0;
-		//printf ("%i-%i-%i-%i-%c-%c-%i\n", kb[l][i][0], kb[l][i][1], kb[l][i][2], kb[l][i][3], kb[l][i][4], kb[l][i][5], kb[l][i][6]);
 	}
 
 	if (fclose(f) == EOF) {
@@ -1035,13 +943,9 @@ int main_omshell(int argc, char * argv[])
 	fullscreen=1;
 	/* Open scr: */
 	if (fullscreen)
-		//scr = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN);
 		scr = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
-		//scr = SDL_SetVideoMode(640, 480, 16, SDL_DOUBLEBUF|SDL_FULLSCREEN);
 	else
-		//scr = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN);
 		scr = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
-		//scr = SDL_SetVideoMode(640, 480, 16, SDL_DOUBLEBUF|SDL_FULLSCREEN);
 	if (scr == NULL){
 		printf("No se pudo iniciar el modo grafico %s\n",SDL_GetError());
 		exit(1);

@@ -250,7 +250,7 @@ char **argv;
 			}
 			break;
 		    case TK_EOF :
-		    	quit_omshell(0);
+		    	// quit_omshell(0);
 			quit(0);
 			break;
 		    case TK_ENTRY :	/* keyboard focus changed */

@@ -97,6 +97,8 @@ void quit_omshell(int error)
 
 	close(event0_fd); /* tecleado */
 	SDL_Quit();
+
+	exit(error);
 }
 
 
@@ -406,7 +408,7 @@ void terminal_init()
 }
 
 int tecleando = 10;
-int x1,y1;
+/* int x1,y1; */
 int kn=0, kx=0, ky=0;
 int pulsado = 0;
 int check_ts()
@@ -477,6 +479,8 @@ int check_ts()
 	return k;
 }
 
+/* Para Openmoko Freerunner */
+/*
 void *teclear(void *arg)
 {
 
@@ -516,6 +520,8 @@ void *teclear(void *arg)
                 usleep(10000);
         }
 }
+*/
+/* FIN Para Openmoko Freerunner */
 
 
 
@@ -808,8 +814,6 @@ char *keyreleased()
 	
 	sprintf(s,"%c",letra);
 	return s;
-
-
 }
 
 
@@ -974,8 +978,11 @@ int main_omshell(int argc, char * argv[])
 		pthread_create(&vib,NULL,vibration,NULL);
 	}
 
-	pthread_t tec;  /* thread del teclado */
+	/* thread del teclado */
+	/* Para Openmoko 
+	pthread_t tec; 
 	pthread_create(&tec,NULL,teclear,NULL);
+	FIN prar Openmoko */
 
 	if (sound) {
 		pthread_t snd;  /*thread*/

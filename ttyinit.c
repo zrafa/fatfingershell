@@ -38,6 +38,7 @@ char xvt_ttyinit_c_sccsid[] = "@(#)ttyinit.c	1.3 11/1/94 (UKC)";
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 #include <signal.h>
 #include <fcntl.h>
@@ -47,12 +48,13 @@ char xvt_ttyinit_c_sccsid[] = "@(#)ttyinit.c	1.3 11/1/94 (UKC)";
 #include <pty.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "xvt.h"
 #include "token.h"
 #include "command.h"
 #include "ttyinit.h"
+#include "omshell.h"
 #include "screen.h"
-//#include "xsetup.h"
 
 /*  NOTES ON PORTING
  *
@@ -243,7 +245,6 @@ write_utmp()
 	pw = getpwuid(getuid());
 	if (pw != NULL)
 		strncpy(utent.ut_name,pw->pw_name,sizeof(utent.ut_name));
-	//strncpy(utent.ut_host,XDisplayString(display),sizeof(utent.ut_host));
 	time(&utent.ut_time);
 	pututline(&utent);
 	endutent();
@@ -265,7 +266,6 @@ write_utmp()
 	pw = getpwuid(getuid());
 	if (pw != NULL)
 		strncpy(utentx.ut_name,pw->pw_name,sizeof(utent.ut_name));
-	//strncpy(utentx.ut_host,XDisplayString(display),sizeof(utentx.ut_host));
 	utentx.ut_syslen = strlen(utentx.ut_host) + 1;
 	time(&utentx.ut_xtime);
 	getutmp(&utentx,&utent);
@@ -295,7 +295,6 @@ write_utmp()
 			pw = getpwuid(getuid());
 			if (pw != NULL)
 				strncpy(utent.ut_name,pw->pw_name,sizeof(utent.ut_name));
-			//strncpy(utent.ut_host,XDisplayString(display),sizeof(utent.ut_host));
 			time(&utent.ut_time);
 			lseek(ut_fd,(long)(tslot * sizeof(struct utmp)),0);
 			write(ut_fd,(char *)&utent,sizeof(struct utmp));
@@ -316,7 +315,6 @@ write_utmp()
 		}
 		if (loc_fd >= 0) {
 			memset(&locent,0,sizeof(struct ttyb));
-			//strncpy(locent.t_name,XDisplayString (display),LN_NAMEL);
 			locent.t_name[LN_NAMEL - 1] = '\0';
 			strcpy(locent.t_extra, "(xvt)");
 			lseek(loc_fd, (long)(tslot*sizeof(locent)), 0);
@@ -370,8 +368,8 @@ quit(status)
 int status;
 {
 	tidy_utmp();
-	quit_omshell();
-	exit(status);
+	quit_omshell(status);
+//	exit(status);
 }
 
 #ifdef BSD_UTMP
@@ -476,7 +474,7 @@ int *pmaster, *pslave;
 	int mfd, sfd;
 
 	if (openpty(&mfd, &sfd, NULL, NULL, NULL)) {
-		error("Cannot allocate a pseudo teletype");
+		perror("Cannot allocate a pseudo teletype");
 		perror("");
 		return(NULL);
 	}
@@ -506,12 +504,10 @@ set_ttymodes()
 #ifdef IMAXBEL
 	term.c_iflag |= IMAXBEL;
 #endif /* IMAXBEL */
-	//if (!is_eightbit())
 	if (!1)
 		term.c_iflag |= ISTRIP;
 	term.c_oflag = OPOST | ONLCR;
 	term.c_cflag = B9600 | CREAD;
-	//if (!is_eightbit())
 	if (!1)
 		term.c_cflag |=  PARENB | CS7;
 	else
@@ -591,10 +587,9 @@ set_ttymodes()
 	scr_get_size(&width,&height);
 	tty_set_size(width,height);
 #ifdef TIOCCONS
-	//if (is_console())
 	if (0)
 		if (ioctl(0,TIOCCONS,0) != 0) {
-			error("Could not set console");
+			perror("Could not set console");
 			perror("");
 		}
 #endif /* TIOCCONS */
@@ -613,7 +608,6 @@ char **argv;
 	int ptyfd, ttyfd;
 	int uid, gid;
 	int i;
-//	extern int messages;
 
 	if ((tty_name = get_pseudo_tty(&ptyfd,&ttyfd)) == NULL)
 		return(-1);
@@ -625,7 +619,7 @@ char **argv;
 		signal(i,catch_sig);
 	comm_pid = fork();
 	if (comm_pid < 0) {
-		error("Can't fork");
+		perror("Can't fork");
 		return(-1);
 	}
 	if (comm_pid == 0) {
@@ -633,7 +627,7 @@ char **argv;
 		pid_t pgid;
 
 		if ((pgid = setsid()) < 0)
-			error("failed to start session");
+			perror("failed to start session");
 
 		/*  Having started a new session, we need to establish
 		 *  a controlling teletype for it.  On some systems
@@ -645,7 +639,8 @@ char **argv;
 #else /* !SCTTY_IOCTL */
 		i = ttyfd;
 		if ((ttyfd = open(tty_name,O_RDWR)) < 0) {
-			error("Can't open teletype %s\n",tty_name);
+			/* error("Can't open teletype %s\n",tty_name); */
+			perror("Can't open teletype \n");
 			return(-1);
 		}
 		close(i);
@@ -656,7 +651,6 @@ char **argv;
 		else
 			gid = -1;
 		fchown(ttyfd,uid,gid);
-		//fchmod(ttyfd,messages ? 0620 : 0600);
 		fchmod(ttyfd,0 ? 0620 : 0600);
 		for (i = 0; i < fd_width; i++)
 			if (i != ttyfd)
@@ -674,7 +668,8 @@ char **argv;
 		setgid(getgid());
 		setuid(uid);
 		execvp(command,argv);
-		error("Couldn't execute %s",command);
+		/* error("Couldn't execute %s",command); */
+		perror("Couldn't execute ");
 		quit(1);
 	}
 	signal(SIGCHLD,catch_child);

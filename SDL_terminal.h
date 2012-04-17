@@ -112,6 +112,7 @@ int SDL_TerminalClear (SDL_Terminal *terminal);
 int SDL_TerminalPrint (SDL_Terminal *terminal, char *text, ...);
 int SDL_TerminalPrintAt (SDL_Terminal *terminal, int row, int column, char *text, ...);
 int SDL_TerminalReset (SDL_Terminal *terminal);
+int SDL_TerminalRenderChar (SDL_Terminal *terminal, int x, int y, char c);
 
 int SDL_TerminalSetFont (SDL_Terminal *terminal, char *font_filename, int size);
 int SDL_TerminalSetSize (SDL_Terminal *terminal, int row, int column);

@@ -205,7 +205,7 @@ char **argv;
 {
 
 	if ((comm_fd = run_command(command,argv)) < 0) {
-		error("Quitting");
+		perror("Quitting");
 		quit(1);
 	}
 	com_buf_next = com_buf_top = com_buf;
@@ -251,7 +251,8 @@ get_com_char(flags)
 int flags;
 {
 	fd_set in_fdset, out_fdset;
-	unsigned char *letra;
+	/* unsigned char *letra; */
+	char *letra;
 	int count;
 	unsigned char mask = 1 ? 0xff : 0x7f;
 	extern int errno;
@@ -286,7 +287,7 @@ int flags;
 				count = send_count < 100 ? send_count : 100;
 				count = write(comm_fd,send_nxt,count);
 				if (count < 0) {
-					error("failed to write to command");
+					perror("failed to write to command");
 					quit(-1);
 				}
 				send_count -= count;

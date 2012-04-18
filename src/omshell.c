@@ -549,16 +549,20 @@ void *vibration(void *arg)
 
 int play = 0;
 int ksound, ktype;
+
 void *playsound(void *arg)
 {
-	int phaserChannel = -1;
+	/* phaserChannel */
+	int c = -1;
 
 	for(;;) {
-		if ((sound) && (play)) {
+
+		if (sound && play) {
 			if (ksound<=nkeys)
-				phaserChannel = Mix_PlayChannel(-1, ks[((kb[layout][ksound][6])-1)][ktype], 0);
+				c = Mix_PlayChannel(-1, ks[((kb[layout][ksound][6])-1)][ktype], 0);
 			play = 0;
 		}
+
 		SDL_Delay(20);
 	}
 
@@ -568,20 +572,17 @@ void *playsound(void *arg)
 void options(int *dark, int *v, int *s, int *fs, int argc, char * argv[])
 {
 	/* options */
-	static const char *optstring = "dvsfh";
 	*dark=0;
 	*v=0;
 	*s=0;
 	*fs=0;
 
-	printf("dark1!!!!!!!!!!!!!=%i\n",argc);
+	static const char *optstring = "dvsfh";
 	int opt = getopt(argc, argv, optstring);
-        
 	
 	while(opt != -1) {
 		switch (opt) {
 			case 'd':
-				printf("dark!!!!!!!!!!!!!\n");
 				*dark = 1;  
 				break;                                
 			case 'v':
@@ -605,23 +606,23 @@ void options(int *dark, int *v, int *s, int *fs, int argc, char * argv[])
 
 SDL_Surface *load_image(const char *f)
 {
-	SDL_Surface *temp, *t;
+	SDL_Surface *s, *st;
 
 	printf("loading image..\n");
 
 	/* temp = SDL_LoadBMP(f); */
-	temp = IMG_Load(f);
-	if (temp == NULL)
+	st = IMG_Load(f);
+	if (st == NULL)
 		quit_omshell(1);
 
-	t = SDL_DisplayFormat(temp);
-	if (t == NULL) {
-		SDL_FreeSurface(temp);
+	s = SDL_DisplayFormat(st);
+	if (s == NULL) {
+		SDL_FreeSurface(st);
 		quit_omshell(1);
 	}
 
-	SDL_FreeSurface(temp);
-	return t;
+	SDL_FreeSurface(st);
+	return s;
 
 }
 

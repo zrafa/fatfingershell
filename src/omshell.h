@@ -1,9 +1,6 @@
 #ifdef __STDC__
 
 #include <SDL/SDL.h>
-#define	nkeys 41	/* for layout 1 */
-#define	nkeys2 41	/* for layout 2 */
-
 
 void quit_omshell(int error);
 
@@ -24,9 +21,7 @@ void Terminal_Clear_Area(int x,int y,int width,int height);
 void Terminal_Copy_Area(int src_x, int src_y, 
 			unsigned int width, unsigned height, int dest_x, int dest_y);
 
-void terminal_init();
-
-int check_ts();
+int check_ts(void);
 
 char *keyreleased();
 

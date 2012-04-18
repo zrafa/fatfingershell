@@ -331,8 +331,7 @@ void Terminal_Copy_Area(int src_x, int src_y,
 }
 
 
-void terminal_init()
-{
+static void terminal_init(void) {
 	FILE *f;
 	int i;
 
@@ -368,11 +367,11 @@ void terminal_init()
 }
 
 int tecleando = 10;
-/* int x1,y1; */
 int kn=0, kx=0, ky=0;
 int pulsado = 0;
-int check_ts()
-{
+
+int check_ts(void) {
+
 	int k=100; /* no key pressed */
 	SDL_Event evento;
 	int mb;

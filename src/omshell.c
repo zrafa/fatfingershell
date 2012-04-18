@@ -66,7 +66,6 @@ SDL_Terminal *terminal;
 int changes=0;
 
 int fd;
-/*, ret; */
 fd_set rset;
 struct termios new;
 char buf[1024];
@@ -850,8 +849,8 @@ void keypressed(int k)
 }
 
 
-void terminal_update()
-{
+void terminal_update() {
+
 #ifdef DEBUG
 	printf("terminalupdate\n");
 #endif
@@ -866,7 +865,6 @@ void terminal_update()
 
 	if (select (fd + 1, &rset, NULL, NULL, &tiempo) < 0) {
 		perror ("select()");
-		/* ret = -1; */
 		quit_omshell(1);
 	}
 	
@@ -898,20 +896,23 @@ void terminal_update()
 
 }
 
+/* load key codes */
+void load_kb_layout(int l, int n, const char *fn) {
 
-void load_kb_layout(int l, int n, const char *fn)	/* load key codes */
-{
 	FILE *f;
 	int i;
 
-	f=fopen(fn,"r");
+	f = fopen(fn,"r");
 	if (f == NULL) {
 		printf("error fopen\n");
 		exit(1);
 	}
 
 	for (i=0; i<n; i++) {
-		fscanf (f, "%i %i %i %i %c %c %i", &kb[l][i][0], &kb[l][i][1], &kb[l][i][2], &kb[l][i][3], &kb[l][i][4], &kb[l][i][5], &kb[l][i][6]);
+		fscanf (f, "%i %i %i %i %c %c %i", &kb[l][i][0], &kb[l][i][1],
+						 &kb[l][i][2], &kb[l][i][3],
+						 &kb[l][i][4], &kb[l][i][5],
+						 &kb[l][i][6]);
 		kb[l][i][7] = 0;
 	}
 
@@ -923,8 +924,7 @@ void load_kb_layout(int l, int n, const char *fn)	/* load key codes */
 }
 
 
-void main_omshell(int argc, char * argv[])
-{
+void main_omshell(int argc, char * argv[]) {
 
 	int fullscreen;
 
@@ -964,10 +964,14 @@ void main_omshell(int argc, char * argv[])
 
 	terminal_init();
 
-	pthread_t vib;  /* thread del vibrador */
-	pthread_t snd;  /* soud thread */
-
 	/* Iniciamos los threads para el sonido y la vibracion */
+
+	pthread_t snd;  /* soud thread */
+	pthread_t vib;  /* thread del vibrador */
+
+	if (sound)
+		pthread_create(&snd, NULL, playsound, NULL);
+
 	if (vibracion)
 		pthread_create(&vib, NULL, vibration, NULL);
 
@@ -976,9 +980,6 @@ void main_omshell(int argc, char * argv[])
 	pthread_t tec; 
 	pthread_create(&tec,NULL,teclear,NULL);
 	FIN prar Openmoko */
-
-	if (sound)
-		pthread_create(&snd, NULL, playsound, NULL);
 
 	SDL_BlitSurface(bg[layout*2], NULL, scr, NULL);
 	Blitspecialkeycolors();

@@ -11,8 +11,6 @@ void Blitspecialkeycolors();
 
 void TerminalBlit(int x1, int y1, int x2, int y2);
 
-void Blitnormalkey(int k);
-
 void TerminalCursor(int x,int y,int width,int height);
 
 void TerminalDelCursor();
@@ -33,23 +31,11 @@ void terminal_init();
 void *vibration(void *arg);
 void *playsound(void *arg);
 
-void options(int *dark, int *v, int *s, int *fs, int argc, char * argv[]);
-
-SDL_Surface *load_image(const char *f);
-
-void load_images();
-
-void load_sounds(); 
-
 int check_ts();
 
 char *keyreleased();
 
 void keypressed(int k);
-
-void terminal_update();
-
-void load_kb_layout(int l, int n, const char *fn);	/* load key codes */
 
 void main_omshell(int argc, char * argv[]);
 

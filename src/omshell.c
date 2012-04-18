@@ -1,7 +1,7 @@
 /*
  * FatFingerShell - a virtual terminal for Openmoko
  *
- * Copyright (C) 2009 Rafael Ignacio Zurita <rizurita@yahoo.com>
+ * Copyright (C) 2009-2012 Rafael Ignacio Zurita <rizurita@yahoo.com>
  *
  *   FatFingerShell is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU Library General Public
@@ -26,11 +26,10 @@
 #include <termios.h>
 #include <sys/select.h>
 
-
 #include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
-#include <SDL/SDL_image.h>
 
 #include <linux/input.h>
 
@@ -590,8 +589,8 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[])
 
 }
 
-SDL_Surface *load_image(const char *f)
-{
+SDL_Surface *load_image(const char *f) {
+
 	SDL_Surface *s, *st;
 
 	printf("loading image..\n");
@@ -612,8 +611,8 @@ SDL_Surface *load_image(const char *f)
 }
 
 
-void load_images() 
-{
+static void load_images(void) {
+
 	if (darkbackground) {
 		bg[0] = load_image("layout-k.bmp.png");	/* normal keyboard */
 		bg[1] = load_image("layout-kp.bmp.png");	/* normal keyboard colour 1 */
@@ -631,26 +630,26 @@ void load_images()
 	}
 }
 
-static void load_one_sound(Mix_Chunk *mc, const char *t) {
+static void load_sound(Mix_Chunk *mc, const char *t) {
 
 	mc = Mix_LoadWAV(t);
 	Mix_VolumeChunk(mc, 64);
 }
 
-void load_sounds() 
-{
+static void load_sounds(void) {
+
 	printf("loading sounds..");
 
 	if (sound) {
 
-		load_one_sound(ks[0][0], "k1.wav");	/* key 1 pressed */ 
-		load_one_sound(ks[0][1], "k11.wav");	/* key 1 released */ 
-		load_one_sound(ks[1][0], "k2.wav");	/* key 2 pressed */ 
-		load_one_sound(ks[1][1], "k22.wav");	/* key 2 released */ 
-		load_one_sound(ks[2][0], "k3.wav");	/* key 3 pressed */ 
-		load_one_sound(ks[2][1], "k33.wav");	/* key 3 released */ 
-		load_one_sound(ks[3][0], "k4.wav");	/* key 4 pressed */ 
-		load_one_sound(ks[3][1], "k44.wav");	/* key 4 released */ 
+		load_sound(ks[0][0], "k1.wav");	/* key 1 pressed */ 
+		load_sound(ks[0][1], "k11.wav");	/* key 1 released */ 
+		load_sound(ks[1][0], "k2.wav");	/* key 2 pressed */ 
+		load_sound(ks[1][1], "k22.wav");	/* key 2 released */ 
+		load_sound(ks[2][0], "k3.wav");	/* key 3 pressed */ 
+		load_sound(ks[2][1], "k33.wav");	/* key 3 released */ 
+		load_sound(ks[3][0], "k4.wav");	/* key 4 pressed */ 
+		load_sound(ks[3][1], "k44.wav");	/* key 4 released */ 
 	}
 }
 
@@ -797,7 +796,7 @@ void keypressed(int k)
 }
 
 
-void terminal_update(void) {
+static void terminal_update(void) {
 
 #ifdef DEBUG
 	printf("terminalupdate\n");
@@ -840,7 +839,7 @@ void terminal_update(void) {
 }
 
 /* load key codes */
-void load_kb_layout(int l, int n, const char *fn) {
+static void load_kb_layout(int l, int n, const char *fn) {
 
 	FILE *f;
 	int i;

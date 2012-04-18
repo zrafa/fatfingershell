@@ -823,6 +823,8 @@ void keypressed(int k)
 #ifdef DEBUG
 	printf("keypressed\n");
 #endif
+	int h, w;
+
 	if (previouskey == 100) {
 		/* playsound(k, 0); */
 		ksound = k;
@@ -830,7 +832,7 @@ void keypressed(int k)
 		play = 1;
 		vibrar = 1;
 	}
-	int h, w;
+
 	if (previouskey != k) {
 		h = kb[layout][previouskey][3] - kb[layout][previouskey][1];
 		w = kb[layout][previouskey][2] - kb[layout][previouskey][0];

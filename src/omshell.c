@@ -44,18 +44,13 @@
 int kb[2][nkeys][8]; /* x1, y1, x2, y2, key, shifted key, sound, status */
 
 SDL_Surface *scr;	/* screen */
-/*  *bc, *texto; */ /* scr = screen, bc = background color, text = text surface */
 
-/* TTF_Font *font; */
 SDL_Surface *bg[6] ; 	/* bg = background: we have 2 different layous and 2
                       	 * colours for each layout = 4 
 			 */
-/* Mix_Chunk *kp, *kr; */
 Mix_Chunk *ks[4][2];	/* key sounds, index 0 = pressed, index 1 = released 
 			 * 4 key different sounds
 			 */
-
-/* int cursorx; int cursory; */
 
 int sound, vibracion;
 int darkbackground;
@@ -67,7 +62,7 @@ SDL_Terminal *terminal;
 
 int fd;
 fd_set rset;
-struct termios new;
+/* struct termios new; */
 char buf[1024];
 
 int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground" 

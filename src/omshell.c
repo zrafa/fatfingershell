@@ -654,8 +654,9 @@ void load_sounds()
 	}
 }
 
-void Blitnormalkey(int k)
-{
+
+static void Blitnormalkey(int k) {
+
 #ifdef DEBUG
 	printf("blitnormalkey\n");
 #endif
@@ -673,7 +674,6 @@ void Blitnormalkey(int k)
 	TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
 	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
 }
-
 
 char *keyreleased()
 {
@@ -770,57 +770,29 @@ char *keyreleased()
 	                	letra=kb[layout][k][4];
         }
 
-	int h, w;
-	h = kb[layout][k][3] - kb[layout][k][1];
-	w = kb[layout][k][2] - kb[layout][k][0];
-	SDL_Rect orig = {kb[layout][k][0], kb[layout][k][1], w, h};
-	SDL_Rect dest = {kb[layout][k][0], kb[layout][k][1], w, h};
-	SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
-	Blitspecialkeycolors();
-	TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
-	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
+	Blitnormalkey(k);
 	
 	sprintf(s,"%c",letra);
 	return s;
 }
-
 
 void keypressed(int k)
 {
 #ifdef DEBUG
 	printf("keypressed\n");
 #endif
-	int h, w;
 
 	if (previouskey == 100) {
-		/* playsound(k, 0); */
 		ksound = k;
 		ktype = 0;
 		play = 1;
 		vibrar = 1;
 	}
 
-	if (previouskey != k) {
-		h = kb[layout][previouskey][3] - kb[layout][previouskey][1];
-		w = kb[layout][previouskey][2] - kb[layout][previouskey][0];
-		SDL_Rect orig = {kb[layout][previouskey][0], kb[layout][previouskey][1], w, h};
-		SDL_Rect dest = {kb[layout][previouskey][0], kb[layout][previouskey][1], w, h};
-		SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
-		Blitspecialkeycolors();
-		TerminalBlit(kb[layout][previouskey][0], kb[layout][previouskey][1], w, h);
-		SDL_UpdateRect(scr, kb[layout][previouskey][0], kb[layout][previouskey][1], w, h);
-	}
+	if (previouskey != k)
+		Blitnormalkey(previouskey);
 	
 	previouskey = k;
-
-	h = kb[layout][k][3] - kb[layout][k][1];
-	w = kb[layout][k][2] - kb[layout][k][0];
-	
-	SDL_Rect orig = {kb[layout][k][0], kb[layout][k][1], w, h};
-	SDL_Rect dest = {kb[layout][k][0], kb[layout][k][1], w, h};
-
-	SDL_BlitSurface(bg[layout*2+1], &orig, scr, &dest);
-	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
 
 }
 
@@ -911,15 +883,14 @@ void main_omshell(int argc, char * argv[]) {
 
 	/* Open scr: */
 	scr = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
-
 	if (scr == NULL){
 		printf("No se pudo iniciar el modo grafico %s\n",SDL_GetError());
 		exit(1);
 	}
 
 
+	/* Open audio */
 	if (sound) {
-		/*Open audio*/
 		if (Mix_OpenAudio(8000, AUDIO_U8, 1, 1024) < 0) {
 			fprintf(stderr, "Warning: Audio could not be setup \nReason: %s\n", SDL_GetError());
 			/* exit(1); */
@@ -931,7 +902,6 @@ void main_omshell(int argc, char * argv[]) {
 		load_sounds();
 
 	load_images();
-
 	terminal_init();
 
 	/* Iniciamos los threads para el sonido y la vibracion */

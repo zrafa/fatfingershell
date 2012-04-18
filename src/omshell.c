@@ -171,27 +171,6 @@ void TerminalCursor(int x,int y,int width,int height)
 }
 
 
-void TerminalDelCursor()
-{
-#ifdef DEBUG
-	printf("termianldelcursor\n");
-#endif
-
-	int x1, y1;
-	x1=cursorx; y1=cursory;
-	getxy(&x1,&y1);
-
-	SDL_Rect dst = {x1, y1, terminal->glyph_size.w, terminal->glyph_size.h};
-	Uint32 color = SDL_MapRGBA (terminal->surface->format, 0,255,0,255);
-	SDL_FillRect (terminal->surface, &dst, color);
-
-	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
-	Blitspecialkeycolors();
-	TerminalBlit (x1, y1,x1 + terminal->glyph_size.w, y1 + terminal->glyph_size.h);
-	SDL_UpdateRect(scr, x1, y1, terminal->glyph_size.w, terminal->glyph_size.h);
-}
-
-
 /*
  * TerminalFillRectangle (imprime el cursor asi que el tamanio es fijo :( )
  */
@@ -508,7 +487,7 @@ void *teclear(void *arg)
 
 int vibrar = 0;
 
-void *vibration(void *arg) {
+static void *vibration(void *arg) {
 
 	char *p = "170\n"; /* power of vibr */
 	char *p1 = "0\n"; /* power of vibr */
@@ -540,7 +519,7 @@ void *vibration(void *arg) {
 int play = 0;
 int ksound, ktype;
 
-void *playsound(void *arg)
+static void *playsound(void *arg)
 {
 	/* phaserChannel */
 	int c = -1;
@@ -795,48 +774,6 @@ void keypressed(int k)
 
 }
 
-
-static void terminal_update(void) {
-
-#ifdef DEBUG
-	printf("terminalupdate\n");
-#endif
-	int i,j;
-	char linea[1024];
-
-	FD_ZERO (&rset);
-	FD_SET (fd, &rset);
-	struct timeval t;
-	t.tv_sec=0;
-	t.tv_usec=10;
-
-	if (select (fd + 1, &rset, NULL, NULL, &t) < 0) {
-		perror ("select()");
-		quit_omshell(1);
-	}
-	
-	if (FD_ISSET (fd, &rset)) {
-
-		i = read (fd, buf, sizeof (buf));
-		if (i > 0 ) {
-			int k=0;
-			for (j = 0; j < i; j++)
-				if (buf[j] != '\r') {
-					linea[k]=buf[j];
-					k++;
-				}
-			
-			linea[k]='\0';
-			SDL_TerminalPrint (terminal, "%s", linea);
-
-			return;
-		}
-	
-		/* just call it EOF; we seem to get EIO on EOF */
-		if ((errno != EINTR) && (errno != EAGAIN))
-			quit_omshell(1);
-	}
-}
 
 /* load key codes */
 static void load_kb_layout(int l, int n, const char *fn) {

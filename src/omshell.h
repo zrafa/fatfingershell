@@ -13,8 +13,6 @@ void TerminalBlit(int x1, int y1, int x2, int y2);
 
 void TerminalCursor(int x,int y,int width,int height);
 
-void TerminalDelCursor();
-
 void TerminalRenderString(int x, int y, char *str, int len);
 
 void TerminalFillRectangle (int x,int y);
@@ -27,9 +25,6 @@ void Terminal_Copy_Area(int src_x, int src_y,
 			unsigned int width, unsigned height, int dest_x, int dest_y);
 
 void terminal_init();
-
-void *vibration(void *arg);
-void *playsound(void *arg);
 
 int check_ts();
 

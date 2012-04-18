@@ -929,7 +929,7 @@ void load_kb_layout(int l, int n, const char *fn)	/* load key codes */
 }
 
 
-int main_omshell(int argc, char * argv[])
+void main_omshell(int argc, char * argv[])
 {
 
 	int fullscreen;
@@ -945,12 +945,9 @@ int main_omshell(int argc, char * argv[])
 		exit(1);
 	}
 
-	fullscreen=1;
 	/* Open scr: */
-	if (fullscreen)
-		scr = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
-	else
-		scr = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
+	scr = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
+
 	if (scr == NULL){
 		printf("No se pudo iniciar el modo grafico %s\n",SDL_GetError());
 		exit(1);

@@ -13,8 +13,6 @@ void TerminalBlit(int x1, int y1, int x2, int y2);
 
 void Blitnormalkey(int k);
 
-/* void mostrar_keyboard(); */
-
 void TerminalCursor(int x,int y,int width,int height);
 
 void TerminalDelCursor();
@@ -53,7 +51,6 @@ void terminal_update();
 
 void load_kb_layout(int l, int n, const char *fn);	/* load key codes */
 
-
-int main_omshell(int argc, char * argv[]);
+void main_omshell(int argc, char * argv[]);
 
 #endif /* __STDC__ */

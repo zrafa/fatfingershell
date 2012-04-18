@@ -4,7 +4,7 @@ SHELL = /bin/sh
 
 CFLAGS = -Wall -DLINUX -g
 INCLUDES = -I/usr/include -I/usr/include/SDL
-LIBFLAGS = -lutil -lSDL-1.2 -lSDL_mixer-1.2 -lSDL_ttf-2.0
+LIBFLAGS = -lutil -lSDL-1.2 -lSDL_mixer-1.2 -lSDL_ttf-2.0 -lSDL_image
 
 objects = xvt.o command.o screen.o ttyinit.o omshell.o SDL_terminal.o
      

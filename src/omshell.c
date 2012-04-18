@@ -618,7 +618,8 @@ SDL_Surface *load_image(const char *f)
 
 	printf("loading image..\n");
 
-	temp = SDL_LoadBMP(f);
+	/* temp = SDL_LoadBMP(f); */
+	temp = IMG_Load(f);
 	if (temp == NULL)
 		quit_omshell(1);
 
@@ -637,19 +638,19 @@ SDL_Surface *load_image(const char *f)
 void load_images() 
 {
 	if (darkbackground) {
-		bg[0] = load_image("layout-k.bmp");	/* normal keyboard */
-		bg[1] = load_image("layout-kp.bmp");	/* normal keyboard colour 1 */
-		bg[2] = load_image("layout-np.bmp");	/* numeric pad */
-		bg[3] = load_image("layout-npp.bmp");	/* numeric pad colour 1 */
-		bg[4] = load_image("layout-kp2.bmp");	/* normal keyboard green */
-		bg[5] = load_image("layout-npp2.bmp");	/* numeric pad green */
+		bg[0] = load_image("layout-k.bmp.png");	/* normal keyboard */
+		bg[1] = load_image("layout-kp.bmp.png");	/* normal keyboard colour 1 */
+		bg[2] = load_image("layout-np.bmp.png");	/* numeric pad */
+		bg[3] = load_image("layout-npp.bmp.png");	/* numeric pad colour 1 */
+		bg[4] = load_image("layout-kp2.bmp.png");	/* normal keyboard green */
+		bg[5] = load_image("layout-npp2.bmp.png");	/* numeric pad green */
 	} else {
-		bg[1] = load_image("layout-k.bmp");	/* normal keyboard */
-		bg[0] = load_image("layout-kp.bmp");	/* normal keyboard colour 1 */
-		bg[3] = load_image("layout-np.bmp");	/* numeric pad */
-		bg[2] = load_image("layout-npp.bmp");	/* numeric pad colour 1 */
-		bg[4] = load_image("layout-kp2.bmp");	/* normal keyboard green */
-		bg[5] = load_image("layout-npp2.bmp");	/* numeric pad green */
+		bg[1] = load_image("layout-k.bmp.png");	/* normal keyboard */
+		bg[0] = load_image("layout-kp.bmp.png");	/* normal keyboard colour 1 */
+		bg[3] = load_image("layout-np.bmp.png");	/* numeric pad */
+		bg[2] = load_image("layout-npp.bmp.png");	/* numeric pad colour 1 */
+		bg[4] = load_image("layout-kp2.bmp.png");	/* normal keyboard green */
+		bg[5] = load_image("layout-npp2.bmp.png");	/* numeric pad green */
 	}
 }
 

@@ -100,8 +100,7 @@ void getxy (int *x, int *y)
 }
 
 
-void Blitspecialkeycolors()
-{
+static void Blitspecialkeycolors(void) {
 #ifdef DEBUG
 	printf("blitspecialcolors\n");
 #endif
@@ -170,35 +169,6 @@ void TerminalCursor(int x,int y,int width,int height)
 	SDL_UpdateRect(scr,x1,y1,w1,h1);
 }
 
-
-/*
- * TerminalFillRectangle (imprime el cursor asi que el tamanio es fijo :( )
- */
-void TerminalFillRectangle (int x,int y)
-{
-#ifdef DEBUG
-	printf("fill rectangle\n");
-#endif
-	SDL_Color fg = terminal->fg_color;
-	SDL_Color bgc = terminal->bg_color;
-	terminal->fg_color = terminal->color;
-	terminal->bg_color.unused = 255;
-
-	int x1, y1;
-	x1=x; y1=y;
-	getxy(&x1,&y1);
-
-	cursorx=x1;
-	cursory=y1-2;
-	terminal->fg_color = fg;
-	terminal->bg_color = bgc;    
-
-	SDL_Rect dst = {x1, y1,x1 + terminal->glyph_size.w, y1 + terminal->glyph_size.h};
-	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
-	Blitspecialkeycolors();
-	TerminalBlit (x1, y1,x1 + terminal->glyph_size.w, y1 + terminal->glyph_size.h);
-	SDL_UpdateRect(scr, x1, y1, terminal->glyph_size.w, terminal->glyph_size.h);
-}
 
 /* see extend.png */
 unsigned char extended_codes[32] = { 111, 72, 72, 70, 67, 76, 111, 43,
@@ -437,51 +407,6 @@ int check_ts(void) {
 
 	return k;
 }
-
-/* Para Openmoko Freerunner */
-/*
-void *teclear(void *arg)
-{
-
-        struct input_event ev0[64];
-
-        int button=0, x=0, y=0, realx=0, realy=0, i, rd;
-
-
-                event0_fd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
-        while (1) {
-
-                  button=0; x=0; y=0; realx=0; realy=0;
-
-                  rd = read(event0_fd, ev0, sizeof(struct input_event) * 32);
-
-                                if (rd != -1) { 
-                  for (i = 0; i < (rd / sizeof(struct input_event) ); i++) {
-
-                        if(ev0[i].type == 3 && ev0[i].code == 0) x = ev0[i].value;
-                        else if (ev0[i].type == 3 && ev0[i].code == 1) y = ev0[i].value;
-                        else if (ev0[i].type == 1 && ev0[i].code == 330) button = ev0[i].value << 2;
-                        else if (ev0[i].type == 0 && ev0[i].code == 0 && ev0[i].value == 0) {
-        
-				
-                                x1 = ((x-110) * 640) / (922-110);                     
-                                y1 = ((y-105) * 480) / (928-105);
-
-
-
-                       }
-                }
-				tecleando=0;
-                } else {
-			tecleando++;
-		}
-
-                usleep(10000);
-        }
-}
-*/
-/* FIN Para Openmoko Freerunner */
-
 
 
 int vibrar = 0;

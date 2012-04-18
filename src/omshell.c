@@ -49,7 +49,7 @@ TTF_Font *font;
 SDL_Surface *bg[6] ; 	/* bg = background: we have 2 different layous and 2
                       	 * colours for each layout = 4 
 			 */
-Mix_Chunk *kp, *kr;
+/* Mix_Chunk *kp, *kr; */
 Mix_Chunk *ks[4][2];	/* key sounds, index 0 = pressed, index 1 = released 
 			 * 4 key different sounds
 			 */
@@ -85,19 +85,18 @@ void quit_omshell(int error)
 	close (fd);
 
 	if (sound) {
-		for (i=0;i<4;i++) {
+		for (i=0; i<4; i++) {
 			Mix_FreeChunk(ks[i][0]);
 			Mix_FreeChunk(ks[i][1]);
 		}
 		Mix_CloseAudio(); 
 	}
 
-	for (i=0;i<4;i++)
+	for (i=0; i<4; i++)
 		SDL_FreeSurface(bg[i]);
 
 	/*close(event0_fd);  *//* teclado */
 	SDL_Quit();
-
 	exit(error);
 }
 
@@ -269,7 +268,7 @@ void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int
 		
 	for (i=0; i<len; i++) {
 		if ( linea[i] > 31) {
-			if ((extended) && (linea[i]>95))
+			if (extended && (linea[i]>95))
 				linea[i] = extended_codes[(linea[i]-96)];
 			SDL_TerminalRenderChar (terminal, 
 				x1 + i * terminal->glyph_size.w,
@@ -350,8 +349,8 @@ void Terminal_Copy_Area(int src_x, int src_y,
 	SDL_SetAlpha (terminal->surface, 0, 0);
 
         error=SDL_BlitSurface (terminal->surface, &src, terminal->surface, &dst);
-	if (error!=0)
-		printf("ERROR!!!!\n");
+	if (error != 0)
+		printf("ERROR SDL_BlitSurface!!!!\n");
 
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
@@ -527,7 +526,7 @@ void *vibration(void *arg) {
 	FILE *f;
 
 	for(;;) {
-		if ((vibracion) && (vibrar)) {
+		if (vibracion && vibrar) {
 
 			f = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
 			fprintf(f, "%s", p);
@@ -558,7 +557,7 @@ void *playsound(void *arg)
 	for(;;) {
 
 		if (sound && play) {
-			if (ksound<=nkeys)
+			if (ksound <= nkeys)
 				c = Mix_PlayChannel(-1, ks[((kb[layout][ksound][6])-1)][ktype], 0);
 			play = 0;
 		}
@@ -609,7 +608,6 @@ SDL_Surface *load_image(const char *f)
 
 	printf("loading image..\n");
 
-	/* temp = SDL_LoadBMP(f); */
 	st = IMG_Load(f);
 	if (st == NULL)
 		quit_omshell(1);
@@ -645,6 +643,11 @@ void load_images()
 	}
 }
 
+static void load_one_sound(Mix_Chunk *mc, const char *t) {
+
+	mc = Mix_LoadWAV(t);
+	Mix_VolumeChunk(mc, 64);
+}
 
 void load_sounds() 
 {
@@ -652,31 +655,15 @@ void load_sounds()
 
 	if (sound) {
 
-	ks[0][0] = Mix_LoadWAV("k1.wav");	/* key 1 pressed */ 
-	Mix_VolumeChunk(ks[0][0], 64);
-
-	ks[0][1] = Mix_LoadWAV("k11.wav");	/* key 1 released */ 
-	Mix_VolumeChunk(ks[0][1], 64);
-
-	ks[1][0] = Mix_LoadWAV("k2.wav");	/* key 2 pressed */ 
-	Mix_VolumeChunk(ks[1][0], 64);
-
-	ks[1][1] = Mix_LoadWAV("k22.wav");	/* key 2 released */ 
-	Mix_VolumeChunk(ks[1][1], 64);
-
-	ks[2][0] = Mix_LoadWAV("k3.wav");	/* key 3 pressed */ 
-	Mix_VolumeChunk(ks[2][0], 64);
-
-	ks[2][1] = Mix_LoadWAV("k33.wav");	/* key 3 released */ 
-	Mix_VolumeChunk(ks[2][1], 64);
-
-	ks[3][0] = Mix_LoadWAV("k4.wav");	/* key 4 pressed */ 
-	Mix_VolumeChunk(ks[3][0], 64);
-
-	ks[3][1] = Mix_LoadWAV("k44.wav");	/* key 4 released */ 
-	Mix_VolumeChunk(ks[3][1], 64);
+		load_one_sound(ks[0][0], "k1.wav");	/* key 1 pressed */ 
+		load_one_sound(ks[0][1], "k11.wav");	/* key 1 released */ 
+		load_one_sound(ks[1][0], "k2.wav");	/* key 2 pressed */ 
+		load_one_sound(ks[1][1], "k22.wav");	/* key 2 released */ 
+		load_one_sound(ks[2][0], "k3.wav");	/* key 3 pressed */ 
+		load_one_sound(ks[2][1], "k33.wav");	/* key 3 released */ 
+		load_one_sound(ks[3][0], "k4.wav");	/* key 4 pressed */ 
+		load_one_sound(ks[3][1], "k44.wav");	/* key 4 released */ 
 	}
-
 }
 
 void Blitnormalkey(int k)

@@ -26,7 +26,6 @@
 #include <termios.h>
 #include <sys/select.h>
 
-#include "omshell.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
@@ -35,6 +34,7 @@
 
 #include <linux/input.h>
 
+#include "omshell.h"
 #include "SDL_terminal.h"
 
 #define	nkeys 41	/* for layout 1 */
@@ -65,7 +65,8 @@ SDL_Terminal *terminal;
 
 int changes=0;
 
-int fd, ret;
+int fd;
+/*, ret; */
 fd_set rset;
 struct termios new;
 char buf[1024];
@@ -517,31 +518,31 @@ void *teclear(void *arg)
 
 
 int vibrar = 0;
-void *vibration(void *arg)
-{
-	char *power="170\n";
-	char *power1="0\n";
-	int duration = 300; /* in milliseconds */
 
-	FILE *archivo;
+void *vibration(void *arg) {
+
+	char *p = "170\n"; /* power of vibr */
+	char *p1 = "0\n"; /* power of vibr */
+	int us = 600000; /* usleep in milliseconds */
+
+	FILE *f;
+
 	for(;;) {
 		if ((vibracion) && (vibrar)) {
 
-			archivo = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
-			fprintf(archivo,"%s",power);
-			fclose(archivo);
-			usleep(duration *200);
-			archivo = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
-			fprintf(archivo,"%s",power1);
-			fclose(archivo);
+			f = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
+			fprintf(f, "%s", p);
+			fclose(f);
+
+			usleep(us);
+
+			f = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
+			fprintf(f, "%s", p1);
+			fclose(f);
 			vibrar = 0;
 		}
-		SDL_Delay(20);
 
-	/*
-	file_handle << "0\n" ;
-	file_handle.close();
-	*/
+		SDL_Delay(20);
 	}
 	
 	return NULL;
@@ -565,7 +566,6 @@ void *playsound(void *arg)
 
 		SDL_Delay(20);
 	}
-
 }
 
 
@@ -866,7 +866,7 @@ void terminal_update()
 
 	if (select (fd + 1, &rset, NULL, NULL, &tiempo) < 0) {
 		perror ("select()");
-		ret = -1;
+		/* ret = -1; */
 		quit_omshell(1);
 	}
 	
@@ -964,11 +964,12 @@ void main_omshell(int argc, char * argv[])
 
 	terminal_init();
 
+	pthread_t vib;  /* thread del vibrador */
+	pthread_t snd;  /* soud thread */
+
 	/* Iniciamos los threads para el sonido y la vibracion */
-	if (vibracion) {
-		pthread_t vib;  /* thread del vibrador */
-		pthread_create(&vib,NULL,vibration,NULL);
-	}
+	if (vibracion)
+		pthread_create(&vib, NULL, vibration, NULL);
 
 	/* thread del teclado */
 	/* Para Openmoko 
@@ -976,14 +977,11 @@ void main_omshell(int argc, char * argv[])
 	pthread_create(&tec,NULL,teclear,NULL);
 	FIN prar Openmoko */
 
-	if (sound) {
-		pthread_t snd;  /*thread*/
-		pthread_create(&snd,NULL,playsound,NULL);
-	};
+	if (sound)
+		pthread_create(&snd, NULL, playsound, NULL);
 
 	SDL_BlitSurface(bg[layout*2], NULL, scr, NULL);
 	Blitspecialkeycolors();
 	SDL_TerminalBlit (terminal);
 	SDL_Flip(scr);
-
 }

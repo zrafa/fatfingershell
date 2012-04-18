@@ -51,7 +51,7 @@ SDL_Surface *bg[6] ; 	/* bg = background: we have 2 different layous and 2
 			 */
 Mix_Chunk *kp, *kr;
 Mix_Chunk *ks[4][2];	/* key sounds, index 0 = pressed, index 1 = released 
-			 * 4 key sounds differents 
+			 * 4 key different sounds
 			 */
 
 int cursorx; int cursory;
@@ -75,7 +75,7 @@ int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground"
 		 * format: r g b transparency
 		 */
 
-int event0_fd = -1;
+/* int event0_fd = -1; */
 
 void quit_omshell(int error)
 {
@@ -95,7 +95,7 @@ void quit_omshell(int error)
 	for (i=0;i<4;i++)
 		SDL_FreeSurface(bg[i]);
 
-	close(event0_fd); /* tecleado */
+	/*close(event0_fd);  *//* teclado */
 	SDL_Quit();
 
 	exit(error);

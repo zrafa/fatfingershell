@@ -62,7 +62,6 @@ SDL_Terminal *terminal;
 
 int fd;
 fd_set rset;
-/* struct termios new; */
 char buf[1024];
 
 int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground" 
@@ -70,7 +69,6 @@ int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground"
 		 * format: r g b transparency
 		 */
 
-/* int event0_fd = -1; */
 
 void quit_omshell(int error)
 {
@@ -90,7 +88,6 @@ void quit_omshell(int error)
 	for (i=0; i<4; i++)
 		SDL_FreeSurface(bg[i]);
 
-	/*close(event0_fd);  *//* teclado */
 	SDL_Quit();
 	exit(error);
 }
@@ -562,13 +559,12 @@ void *playsound(void *arg)
 }
 
 
-void options(int *dark, int *v, int *s, int *fs, int argc, char * argv[])
+static void options(int *dark, int *v, int *s, int argc, char * argv[])
 {
 	/* options */
 	*dark=0;
 	*v=0;
 	*s=0;
-	*fs=0;
 
 	static const char *optstring = "dvsfh";
 	int opt = getopt(argc, argv, optstring);
@@ -584,11 +580,8 @@ void options(int *dark, int *v, int *s, int *fs, int argc, char * argv[])
 			case 's':
 				*s = 1;  
 				break;                                
-			case 'f':
-				*fs = 1;  
-				break;
 			case 'h':
-				printf("usage: omshell [-v] [-s] [-f] \n\t -v : vibration \n\t -s : sound\n\t -f : fullscreen \n\t -d : dark background (black&white) (default: gray&black)\n");
+				printf("usage: omshell [-v] [-s] [-f] \n\t -v : vibration \n\t -s : sound\n\t -d : dark background (black&white) (default: gray&black)\n");
 				exit(0);                                
 			default: break;
 		}                
@@ -667,15 +660,18 @@ void Blitnormalkey(int k)
 	printf("blitnormalkey\n");
 #endif
 	int h, w;
+
 	h = kb[layout][k][3] - kb[layout][k][1];
 	w = kb[layout][k][2] - kb[layout][k][0];
+
 	SDL_Rect orig = {kb[layout][k][0], kb[layout][k][1], w, h};
 	SDL_Rect dest = {kb[layout][k][0], kb[layout][k][1], w, h};
+
 	SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
+
 	Blitspecialkeycolors();
 	TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
 	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
-
 }
 
 
@@ -698,7 +694,6 @@ char *keyreleased()
 
 	k=previouskey;
 
-	/* playsound(previouskey, 1);	key released */
 	ksound = previouskey;
 	ktype = 1;
 	play = 1;
@@ -852,11 +847,7 @@ void terminal_update(void) {
 	if (FD_ISSET (fd, &rset)) {
 
 		i = read (fd, buf, sizeof (buf));
-		if (i <= 0) {
-			/* just call it EOF; we seem to get EIO on EOF */
-			if ((errno != EINTR) && (errno != EAGAIN))
-				quit_omshell(1);
-		} else {
+		if (i > 0 ) {
 			int k=0;
 			for (j = 0; j < i; j++)
 				if (buf[j] != '\r') {
@@ -866,7 +857,13 @@ void terminal_update(void) {
 			
 			linea[k]='\0';
 			SDL_TerminalPrint (terminal, "%s", linea);
+
+			return;
 		}
+	
+		/* just call it EOF; we seem to get EIO on EOF */
+		if ((errno != EINTR) && (errno != EAGAIN))
+			quit_omshell(1);
 	}
 }
 
@@ -883,10 +880,11 @@ void load_kb_layout(int l, int n, const char *fn) {
 	}
 
 	for (i=0; i<n; i++) {
-		fscanf (f, "%i %i %i %i %c %c %i", &kb[l][i][0], &kb[l][i][1],
-						 &kb[l][i][2], &kb[l][i][3],
-						 &kb[l][i][4], &kb[l][i][5],
-						 &kb[l][i][6]);
+		fscanf (f, "%i %i %i %i %c %c %i",
+				 &kb[l][i][0], &kb[l][i][1],
+				 &kb[l][i][2], &kb[l][i][3],
+				 &kb[l][i][4], &kb[l][i][5],
+				 &kb[l][i][6]);
 		kb[l][i][7] = 0;
 	}
 
@@ -900,9 +898,7 @@ void load_kb_layout(int l, int n, const char *fn) {
 
 void main_omshell(int argc, char * argv[]) {
 
-	int fullscreen;
-
-	options(&darkbackground, &vibracion, &sound, &fullscreen, argc, argv);
+	options(&darkbackground, &vibracion, &sound, argc, argv);
 
 	load_kb_layout(0,nkeys,"keyboard.cfg");		/* load key codes */
 	load_kb_layout(1,nkeys,"keyboard2.cfg");	/* load key codes */

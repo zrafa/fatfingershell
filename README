@@ -1,6 +1,10 @@
 FatFingerShell virtual terminal
 ===============================
 
+FatFingerShell is a virtual terminal for tablets, phones and
+other devices with just touchscreen.
+
+
 2009 - Rafael Ignacio Zurita <rizurita@yahoo.com>
 
   FatFingerShell is free software; you can redistribute it and/or
@@ -10,7 +14,7 @@ FatFingerShell virtual terminal
 
 
 
-It is a virtual terminal for Openmoko, with a complete fullscreen keyboard,
+FatFingerShell is a virtual terminal mainly for Openmoko, with a complete fullscreen keyboard,
 and sound/screen/vibrator feedback.
 
 You can set the colors and the transparency, set new keyboard layouts (hard yet)

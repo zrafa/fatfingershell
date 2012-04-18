@@ -105,12 +105,8 @@ void quit_omshell(int error)
 /* 544 393 xmax ymax */
 void getxy (int *x, int *y)
 {
-	int x1, y1;
-	x1 = (*x) * 640 / 544;
-	y1 = (*y) * 458 / 393;
-	(*x) = x1;
-	(*y) = y1;
-
+	(*x) = (*x) * 640 / 544;
+	(*y) = (*y) * 458 / 393;
 }
 
 
@@ -124,7 +120,8 @@ void Blitspecialkeycolors()
 	
 	Uint32 color;
 
-	for (i=0;i<nkeys;i++) {
+	for (i=0; i<nkeys; i++) {
+
 		h = kb[layout][i][3] - kb[layout][i][1];
 		w = kb[layout][i][2] - kb[layout][i][0];
 	
@@ -148,18 +145,19 @@ void TerminalBlit(int x1, int y1, int x2, int y2)
 	SDL_Rect dst = {x1, y1, x2, y2};
         SDL_SetAlpha (terminal->surface, SDL_SRCALPHA, 0);
 	SDL_BlitSurface (terminal->surface, &dst, scr, &dst);
-
 }
 
 int cursorx=1000;
 int cursory=1000;
 int cursorw=1000;
 int cursorh=1000;
+
 void TerminalCursor(int x,int y,int width,int height)
 {
 #ifdef DEBUG
 	printf("terminalcursor\n");
 #endif
+
 	int x1, y1;
 	x1=x+2; y1=y;
 	getxy(&x1,&y1);
@@ -176,12 +174,10 @@ void TerminalCursor(int x,int y,int width,int height)
 		TerminalBlit (cursorx, cursory, cursorw, cursorh);
 		SDL_UpdateRect(scr,cursorx,cursory,cursorw,cursorh);
 	}
+
 	cursorx=x1; cursory=y1; cursorw=w1; cursorh=h1;
-		
 	SDL_FillRect (scr, &dst, color);
-
 	SDL_UpdateRect(scr,x1,y1,w1,h1);
-
 }
 
 
@@ -203,7 +199,6 @@ void TerminalDelCursor()
 	Blitspecialkeycolors();
 	TerminalBlit (x1, y1,x1 + terminal->glyph_size.w, y1 + terminal->glyph_size.h);
 	SDL_UpdateRect(scr, x1, y1, terminal->glyph_size.w, terminal->glyph_size.h);
-
 }
 
 
@@ -242,10 +237,6 @@ unsigned char extended_codes[32] = { 111, 72, 72, 70, 67, 76, 111, 43,
 				     45, 45, 95, 95, 43, 43, 43, 43,
 				     124, 60, 62, 109, 61, 69, 46, 32 };
 
-
-/*
-* TerminalDrawImageString(display,vt_win,txgc,x,y,str,len);
-*/
 
 void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int inverso, int extended)
 {

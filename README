@@ -40,6 +40,26 @@ Features
 How to install and test
 =======================
 			
+Building from sources
+---------------------
+
+cd src/
+make
+
+Install on PC
+-------------
+
+copy fatfingershell binary to /usr/bin/ or your prefered bin directory.
+copy share/ directory whereever you want.
+
+Run fatfingershell with :
+cd /path/to/share/
+fatfingershell -e /bin/bash
+
+
+Install on Openmoko Freerunner
+------------------------------
+
 opkg install http://ffs.projects.openmoko.org/fatfingershell_0.2_armv4t.ipk 
 
 Just tap in the fatfingershell icon. Or run /usr/bin/fatfingershell.sh
@@ -49,8 +69,9 @@ Fn key changes the keyboard layout.
 CTRL+, and CTRL+. to do scroll up/down.
 
 
-Running on console
-------------------
+Running on console of Freerunner
+--------------------------------
+
 cd /var/gamerunner/usr/share/fatfingershell
 
 export SDL_VIDEODRIVER=fbcon

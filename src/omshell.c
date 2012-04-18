@@ -37,15 +37,16 @@
 #include "omshell.h"
 #include "SDL_terminal.h"
 
-#define	nkeys 41	/* for layout 1 */
-#define	nkeys2 41	/* for layout 2 */
+#define	nkeys 41	/* for layouts */
 
 /* #define DEBUG 1 */
 
 int kb[2][nkeys][8]; /* x1, y1, x2, y2, key, shifted key, sound, status */
 
-SDL_Surface *scr, *bc, *texto; /* scr = screen, bc = background color, text = text surface */
-TTF_Font *font;
+SDL_Surface *scr;	/* screen */
+/*  *bc, *texto; */ /* scr = screen, bc = background color, text = text surface */
+
+/* TTF_Font *font; */
 SDL_Surface *bg[6] ; 	/* bg = background: we have 2 different layous and 2
                       	 * colours for each layout = 4 
 			 */
@@ -54,7 +55,7 @@ Mix_Chunk *ks[4][2];	/* key sounds, index 0 = pressed, index 1 = released
 			 * 4 key different sounds
 			 */
 
-int cursorx; int cursory;
+/* int cursorx; int cursory; */
 
 int sound, vibracion;
 int darkbackground;
@@ -63,7 +64,6 @@ int layout=0;	/* current layout */
 
 SDL_Terminal *terminal;
 
-int changes=0;
 
 int fd;
 fd_set rset;
@@ -710,7 +710,6 @@ char *keyreleased()
 	vibrar = 1;
 
 	previouskey = 100;
-	changes=1; 
 
 	SDL_Event backspace;
 	backspace.type = SDL_KEYDOWN;
@@ -836,7 +835,7 @@ void keypressed(int k)
 }
 
 
-void terminal_update() {
+void terminal_update(void) {
 
 #ifdef DEBUG
 	printf("terminalupdate\n");
@@ -846,23 +845,23 @@ void terminal_update() {
 
 	FD_ZERO (&rset);
 	FD_SET (fd, &rset);
-	struct timeval tiempo;
-	tiempo.tv_sec=0;
-	tiempo.tv_usec=10;
+	struct timeval t;
+	t.tv_sec=0;
+	t.tv_usec=10;
 
-	if (select (fd + 1, &rset, NULL, NULL, &tiempo) < 0) {
+	if (select (fd + 1, &rset, NULL, NULL, &t) < 0) {
 		perror ("select()");
 		quit_omshell(1);
 	}
 	
 	if (FD_ISSET (fd, &rset)) {
+
 		i = read (fd, buf, sizeof (buf));
 		if (i <= 0) {
-			if ((errno != EINTR) && (errno != EAGAIN)) {
-				/* just call it EOF; we seem to get EIO on EOF */
+			/* just call it EOF; we seem to get EIO on EOF */
+			if ((errno != EINTR) && (errno != EAGAIN))
 				quit_omshell(1);
-			}
-		} else if (i > 0) {
+		} else {
 			int k=0;
 			for (j = 0; j < i; j++)
 				if (buf[j] != '\r') {
@@ -871,16 +870,9 @@ void terminal_update() {
 				}
 			
 			linea[k]='\0';
-			SDL_TerminalPrint (terminal, "%s",linea);
-						/*
-				*/
-			changes=1;
-
+			SDL_TerminalPrint (terminal, "%s", linea);
 		}
 	}
-
-
-
 }
 
 /* load key codes */
@@ -918,7 +910,7 @@ void main_omshell(int argc, char * argv[]) {
 	options(&darkbackground, &vibracion, &sound, &fullscreen, argc, argv);
 
 	load_kb_layout(0,nkeys,"keyboard.cfg");		/* load key codes */
-	load_kb_layout(1,nkeys2,"keyboard2.cfg");	/* load key codes */
+	load_kb_layout(1,nkeys,"keyboard2.cfg");	/* load key codes */
 
 	/* Init SDL: */
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0 ) {

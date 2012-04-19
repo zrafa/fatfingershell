@@ -130,7 +130,6 @@ static void Blitspecialkeycolors(void) {
 			omshell_TerminalBlit (kb[layout][i][0], kb[layout][i][1], w, h);
 		}
 	}
-
 }
 
 
@@ -165,7 +164,6 @@ void omshell_TerminalCursor(int x,int y,int width,int height) {
 	SDL_FillRect (scr, &dst, color);
 	SDL_UpdateRect(scr,x1,y1,w1,h1);
 }
-
 
 /* see extend.png */
 unsigned char extended_codes[32] = { 111, 72, 72, 70, 67, 76, 111, 43,
@@ -226,7 +224,6 @@ void omshell_TerminalDrawImageString(int x,int y, unsigned char *str,int len, in
 		terminal->fg_color = fg;
 		terminal->bg_color = bgc;
 	}
-
 }
 
 
@@ -327,7 +324,6 @@ static void terminal_init(void) {
 
 	SDL_TerminalClear (terminal);
 	SDL_TerminalPrint (terminal, "Terminal initialized\n");
-
 }
 
 int tecleando = 10;
@@ -437,8 +433,8 @@ static void *vibration(void *arg) {
 int play = 0;
 int ksound, ktype;
 
-static void *playsound(void *arg)
-{
+static void *playsound(void *arg) {
+
 	/* phaserChannel */
 	int c = -1;
 
@@ -455,8 +451,8 @@ static void *playsound(void *arg)
 }
 
 
-static void options(int *dark, int *v, int *s, int argc, char * argv[])
-{
+static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
+
 	/* options */
 	*dark=0;
 	*v=0;
@@ -483,7 +479,6 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[])
 		}                
 		opt = getopt(argc, argv, optstring);
 	}
-
 }
 
 SDL_Surface *load_image(const char *f) {
@@ -504,9 +499,7 @@ SDL_Surface *load_image(const char *f) {
 
 	SDL_FreeSurface(st);
 	return s;
-
 }
-
 
 static void load_images(void) {
 
@@ -517,14 +510,15 @@ static void load_images(void) {
 		bg[3] = load_image("layout-npp.bmp.png");	/* numeric pad colour 1 */
 		bg[4] = load_image("layout-kp2.bmp.png");	/* normal keyboard green */
 		bg[5] = load_image("layout-npp2.bmp.png");	/* numeric pad green */
-	} else {
-		bg[1] = load_image("layout-k.bmp.png");	/* normal keyboard */
-		bg[0] = load_image("layout-kp.bmp.png");	/* normal keyboard colour 1 */
-		bg[3] = load_image("layout-np.bmp.png");	/* numeric pad */
-		bg[2] = load_image("layout-npp.bmp.png");	/* numeric pad colour 1 */
-		bg[4] = load_image("layout-kp2.bmp.png");	/* normal keyboard green */
-		bg[5] = load_image("layout-npp2.bmp.png");	/* numeric pad green */
+		return;
 	}
+
+	bg[1] = load_image("layout-k.bmp.png");	/* normal keyboard */
+	bg[0] = load_image("layout-kp.bmp.png");	/* normal keyboard colour 1 */
+	bg[3] = load_image("layout-np.bmp.png");	/* numeric pad */
+	bg[2] = load_image("layout-npp.bmp.png");	/* numeric pad colour 1 */
+	bg[4] = load_image("layout-kp2.bmp.png");	/* normal keyboard green */
+	bg[5] = load_image("layout-npp2.bmp.png");	/* numeric pad green */
 }
 
 static void load_sound(Mix_Chunk *mc, const char *t) {
@@ -577,9 +571,7 @@ char *omshell_keyreleased(void) {
 #endif
 	char letra=0;
 	char *s=malloc(2);
-	int i,j;
-
-	int k;
+	int i,j,k;
 
 	if (previouskey >= 100) {
 		letra='\0'; 
@@ -603,9 +595,13 @@ char *omshell_keyreleased(void) {
 	if ((kb[layout][k][4] == 102) && (kb[layout][k][5] == 102)) { /* fn key , f=102 ascii*/
 		letra='\0';
 		layout++;
-		if (layout == 2) layout = 0;
+		if (layout == 2)
+			layout = 0;
+
 		kb[0][k][7]++;
-		if (kb[0][k][7]==2) kb[0][k][7] = 0;
+		if (kb[0][k][7]==2)
+			kb[0][k][7] = 0;
+
 		SDL_BlitSurface(bg[layout*2], NULL, scr, NULL);
 		Blitspecialkeycolors();
 		SDL_TerminalBlit(terminal);
@@ -687,7 +683,6 @@ void omshell_keypressed(int k) {
 		Blitnormalkey(previouskey);
 	
 	previouskey = k;
-
 }
 
 

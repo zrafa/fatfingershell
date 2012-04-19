@@ -368,8 +368,7 @@ quit(status)
 int status;
 {
 	tidy_utmp();
-	quit_omshell(status);
-//	exit(status);
+	omshell_quit(status);
 }
 
 #ifdef BSD_UTMP

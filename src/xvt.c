@@ -164,7 +164,7 @@ char **argv;
 		}
 	}
 
-	main_omshell(argc, argv);
+	omshell_main(argc, argv);
 
 	/* Make a copy of the command line argument array
 	 */

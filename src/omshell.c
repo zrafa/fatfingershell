@@ -69,7 +69,7 @@ int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground"
 		 */
 
 
-void quit_omshell(int error)
+void omshell_quit(int error)
 {
 	int i;
 
@@ -500,12 +500,12 @@ SDL_Surface *load_image(const char *f) {
 
 	st = IMG_Load(f);
 	if (st == NULL)
-		quit_omshell(1);
+		omshell_quit(1);
 
 	s = SDL_DisplayFormat(st);
 	if (s == NULL) {
 		SDL_FreeSurface(st);
-		quit_omshell(1);
+		omshell_quit(1);
 	}
 
 	SDL_FreeSurface(st);
@@ -728,7 +728,7 @@ static void load_kb_layout(int l, int n, const char *fn) {
 }
 
 
-void main_omshell(int argc, char * argv[]) {
+void omshell_main(int argc, char * argv[]) {
 
 	options(&darkbackground, &vibracion, &sound, argc, argv);
 

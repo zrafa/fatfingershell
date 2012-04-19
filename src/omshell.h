@@ -1,14 +1,11 @@
-#ifdef __STDC__
+#ifndef OMSHELL_H
+#define OMSHELL_H
 
-#include <SDL/SDL.h>
-
-void quit_omshell(int error);
+void omshell_quit(int error);
 
 void TerminalBlit(int x1, int y1, int x2, int y2);
 
 void TerminalCursor(int x,int y,int width,int height);
-
-void TerminalRenderString(int x, int y, char *str, int len);
 
 void TerminalDrawImageString(int x,int y,unsigned char *str,int len, int b, int inverso, int extended);
 
@@ -23,6 +20,6 @@ char *keyreleased();
 
 void keypressed(int k);
 
-void main_omshell(int argc, char * argv[]);
+void omshell_main(int argc, char * argv[]);
 
-#endif /* __STDC__ */
+#endif /* OMSHELL_H */

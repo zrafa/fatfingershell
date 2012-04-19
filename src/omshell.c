@@ -93,8 +93,7 @@ void omshell_quit(int error)
 
 
 /* 544 393 xmax ymax */
-void getxy (int *x, int *y)
-{
+void getxy (int *x, int *y) {
 	(*x) = (*x) * 640 / 544;
 	(*y) = (*y) * 458 / 393;
 }

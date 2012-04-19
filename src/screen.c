@@ -641,9 +641,8 @@ int len, nlcount;
 			}
 			width = (cwidth - screen->col - n) * fwidth;
 			x2 = x + n * fwidth;
-			if (width > 0) {
+			if (width > 0)
 				omshell_Terminal_Copy_Area(x,y,width,fheight,x2,y);
-			}
 		}
 
 		paint_rval_text(str,rstyle,n,x,y);
@@ -868,9 +867,9 @@ int mode;
 			memset(screen->rend[i],0,cwidth + 1);
 		}
 		check_selection(0,screen->row - 1);
-		if (height > 0) {
+		if (height > 0)
 			omshell_Terminal_Clear_Area(x, y, width, height);
-		}
+
 		scr_erase_line(mode);
 		break;
 	    case END :
@@ -882,9 +881,9 @@ int mode;
 				memset(screen->rend[i],0,cwidth + 1);
 			}
 			check_selection(screen->row + 1,cheight - 1);
-			if (height > 0) {
+			if (height > 0)
 				omshell_Terminal_Clear_Area(x, y, width, height);
-			}
+
 			scr_erase_line(mode);
 			break;
 		}
@@ -985,9 +984,9 @@ int count;
 	x2 = MARGIN + screen->col * fwidth;
 	x1 = x2 + count * fwidth;
 	width = (cwidth - count - screen->col) * fwidth;
-	if (width > 0) {
+	if (width > 0)
 		omshell_Terminal_Copy_Area(x1, y, width, fheight, x2, y);
-	}
+
 	x1 = x2 + width;
 	width = count * fwidth;
 	omshell_Terminal_Clear_Area(x1, y, width, fheight);
@@ -1024,9 +1023,9 @@ int count;
 	x1 = MARGIN + screen->col * fwidth;
 	x2 = x1 + count * fwidth;
 	width = (cwidth - count - screen->col) * fwidth;
-	if (width > 0) {
+	if (width > 0)
 		omshell_Terminal_Copy_Area(x1, y, width, fheight, x2, y);
-	}
+
 	x1 = MARGIN + screen->col * fwidth;
 	width = count * fwidth;
 	omshell_Terminal_Clear_Area(x1, y, width, fheight);
@@ -1267,9 +1266,9 @@ int len, x, y;
 		/* because now we need to print extended chars, we use str and 1 for
  		   the last argument */
 		omshell_TerminalDrawImageString(x,y,str,len, b, inverso, 1);
-		if (overstrike) {
+		if (overstrike)
 			omshell_TerminalDrawImageString(x + 1,y,str,len, b, inverso, 1);
-		}
+
 		free((void *)buf);
 	}
 
@@ -1337,9 +1336,9 @@ int row1, row2, col1, col2;
 		paint_rvec_text(str,r,m,x1,y1);
 		x2 = x1 + m * fwidth;
 		width = (col2 - col1 + 1 - m) * fwidth;
-		if (width > 0) {
+		if (width > 0)
 			omshell_Terminal_Clear_Area(x2, y1, width, fheight);
-		}
+
 		y1 += fheight;
 	}
 
@@ -1363,9 +1362,9 @@ int row1, row2, col1, col2;
 		paint_rvec_text(str,r,m,x1,y1);
 		x2 = x1 + m * fwidth;
 		width = (col2 - col1 + 1 - m) * fwidth;
-		if (width > 0) {
+		if (width > 0)
 			omshell_Terminal_Clear_Area(x2, y1, width, fheight);
-		}
+
 		y1 += fheight;
 	}
 	free(str);

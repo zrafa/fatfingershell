@@ -642,7 +642,7 @@ int len, nlcount;
 			width = (cwidth - screen->col - n) * fwidth;
 			x2 = x + n * fwidth;
 			if (width > 0) {
-				Terminal_Copy_Area(x,y,width,fheight,x2,y);
+				omshell_Terminal_Copy_Area(x,y,width,fheight,x2,y);
 			}
 		}
 
@@ -841,7 +841,7 @@ int mode;
 		}
 	cursor();
 	check_selection(screen->row,screen->row);
-	Terminal_Clear_Area(x,y,width,height);
+	omshell_Terminal_Clear_Area(x,y,width,height);
 	screen->wrap_next = 0;
 	cursor();
 }
@@ -869,7 +869,7 @@ int mode;
 		}
 		check_selection(0,screen->row - 1);
 		if (height > 0) {
-			Terminal_Clear_Area(x, y, width, height);
+			omshell_Terminal_Clear_Area(x, y, width, height);
 		}
 		scr_erase_line(mode);
 		break;
@@ -883,7 +883,7 @@ int mode;
 			}
 			check_selection(screen->row + 1,cheight - 1);
 			if (height > 0) {
-				Terminal_Clear_Area(x, y, width, height);
+				omshell_Terminal_Clear_Area(x, y, width, height);
 			}
 			scr_erase_line(mode);
 			break;
@@ -905,7 +905,7 @@ int mode;
 			}
 		cursor();
 		check_selection(0,cheight - 1);
-		Terminal_Clear_Area(x, y, width, height);
+		omshell_Terminal_Clear_Area(x, y, width, height);
 		cursor();
 		break;
 	    default :
@@ -986,11 +986,11 @@ int count;
 	x1 = x2 + count * fwidth;
 	width = (cwidth - count - screen->col) * fwidth;
 	if (width > 0) {
-		Terminal_Copy_Area(x1, y, width, fheight, x2, y);
+		omshell_Terminal_Copy_Area(x1, y, width, fheight, x2, y);
 	}
 	x1 = x2 + width;
 	width = count * fwidth;
-	Terminal_Clear_Area(x1, y, width, fheight);
+	omshell_Terminal_Clear_Area(x1, y, width, fheight);
 	screen->wrap_next = 0;
 	cursor();
 }
@@ -1025,11 +1025,11 @@ int count;
 	x2 = x1 + count * fwidth;
 	width = (cwidth - count - screen->col) * fwidth;
 	if (width > 0) {
-		Terminal_Copy_Area(x1, y, width, fheight, x2, y);
+		omshell_Terminal_Copy_Area(x1, y, width, fheight, x2, y);
 	}
 	x1 = MARGIN + screen->col * fwidth;
 	width = count * fwidth;
-	Terminal_Clear_Area(x1, y, width, fheight);
+	omshell_Terminal_Clear_Area(x1, y, width, fheight);
 	screen->wrap_next = 0;
 	cursor();
 }
@@ -1200,7 +1200,7 @@ int n;
 		y1 = MARGIN;
 		y2 = y1 + d * fheight;
 		height = (cheight - d) * fheight;
-		Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
+		omshell_Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
 		refresh(0,d - 1,0,cwidth - 1);
 	} else if (d < 0 && -d < cheight) {
 		/*  Text has moved down by less than a screen.
@@ -1209,7 +1209,7 @@ int n;
 		y2 = MARGIN;
 		y1 = y2 + d * fheight;
 		height = (cheight - d) * fheight;
-		Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
+		omshell_Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
 		refresh(cheight - d,cheight - 1,0,cwidth - 1);
 	} else
 		refresh(0,cheight - 1,0,cwidth - 1);
@@ -1247,9 +1247,9 @@ int len, x, y;
 		y +=  11;/* THe boldfont->ascent and maintfont->ascent are hardcoded BAD ! */
 
 	if ((rval & CS_STYLE) == CS_USASCII) {
-		TerminalDrawImageString(x,y,str,len, b, inverso, 0);
+		omshell_TerminalDrawImageString(x,y,str,len, b, inverso, 0);
 		if (overstrike) {
-			TerminalDrawImageString(x + 1,y,str,len, b, inverso, 0);
+			omshell_TerminalDrawImageString(x + 1,y,str,len, b, inverso, 0);
 		}
 	} else {
 		buf = (unsigned char *)cmalloc(len);
@@ -1266,9 +1266,9 @@ int len, x, y;
 
 		/* because now we need to print extended chars, we use str and 1 for
  		   the last argument */
-		TerminalDrawImageString(x,y,str,len, b, inverso, 1);
+		omshell_TerminalDrawImageString(x,y,str,len, b, inverso, 1);
 		if (overstrike) {
-			TerminalDrawImageString(x + 1,y,str,len, b, inverso, 1);
+			omshell_TerminalDrawImageString(x + 1,y,str,len, b, inverso, 1);
 		}
 		free((void *)buf);
 	}
@@ -1338,7 +1338,7 @@ int row1, row2, col1, col2;
 		x2 = x1 + m * fwidth;
 		width = (col2 - col1 + 1 - m) * fwidth;
 		if (width > 0) {
-			Terminal_Clear_Area(x2, y1, width, fheight);
+			omshell_Terminal_Clear_Area(x2, y1, width, fheight);
 		}
 		y1 += fheight;
 	}
@@ -1364,7 +1364,7 @@ int row1, row2, col1, col2;
 		x2 = x1 + m * fwidth;
 		width = (col2 - col1 + 1 - m) * fwidth;
 		if (width > 0) {
-			Terminal_Clear_Area(x2, y1, width, fheight);
+			omshell_Terminal_Clear_Area(x2, y1, width, fheight);
 		}
 		y1 += fheight;
 	}
@@ -1537,11 +1537,11 @@ int row1, row2, count;
 			y2 = MARGIN + row1 * fheight;
 			y1 = y2 + count * fheight;
 			height = (row2 - row1 - count) * fheight;
-			Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
+			omshell_Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
 		}
 		height = count * fheight;
 		y1 = MARGIN + (row2 - count) * fheight;
-		Terminal_Clear_Area(0, y1, pwidth, height);
+		omshell_Terminal_Clear_Area(0, y1, pwidth, height);
 	}
 	if (count < 0) {
 		count = -count;
@@ -1576,11 +1576,11 @@ int row1, row2, count;
 			y1 = MARGIN + row1 * fheight;
 			y2 = y1 + count * fheight;
 			height = (row2 - row1 - count) * fheight;
-			Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
+			omshell_Terminal_Copy_Area(0, y1, pwidth, height, 0, y2);
 		}
 		height = count * fheight;
 		y1 = MARGIN + row1 * fheight;
-		Terminal_Clear_Area(0, y1, pwidth, height);
+		omshell_Terminal_Clear_Area(0, y1, pwidth, height);
 	}
 }
 
@@ -1685,7 +1685,7 @@ cursor()
 	/* CORREGIR PARA QUE SE VEA EL CURSOR */
 	x = MARGIN + fwidth * screen->col;
 	y = MARGIN + fheight * screen->row;
-	TerminalCursor(x,y,fwidth,fheight);
+	omshell_TerminalCursor(x,y,fwidth,fheight);
 	/* fin de CORREGIR PARA QUE SE VEA EL CURSOR */
 
 	if (focus == 0) {

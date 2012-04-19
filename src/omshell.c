@@ -99,6 +99,14 @@ void getxy (int *x, int *y)
 	(*y) = (*y) * 458 / 393;
 }
 
+static void omshell_TerminalBlit(int x1, int y1, int x2, int y2) {
+#ifdef DEBUG
+	printf("terminalblit x1=%i,y1=%i   x2=%i,y2=%i\n",x1,y1,x2,y2);
+#endif
+	SDL_Rect dst = {x1, y1, x2, y2};
+        SDL_SetAlpha (terminal->surface, SDL_SRCALPHA, 0);
+	SDL_BlitSurface (terminal->surface, &dst, scr, &dst);
+}
 
 static void Blitspecialkeycolors(void) {
 #ifdef DEBUG
@@ -119,30 +127,19 @@ static void Blitspecialkeycolors(void) {
 		if (kb[layout][i][7] == 1) {
 			color = SDL_MapRGBA (scr->format, 0,255,0,0);
 			SDL_BlitSurface(bg[layout*2+1], &dst, scr, &dst);
-			TerminalBlit (kb[layout][i][0], kb[layout][i][1], w, h);
+			omshell_TerminalBlit (kb[layout][i][0], kb[layout][i][1], w, h);
 		}
 	}
 
 }
 
 
-void TerminalBlit(int x1, int y1, int x2, int y2)
-{
-#ifdef DEBUG
-	printf("terminalblit x1=%i,y1=%i   x2=%i,y2=%i\n",x1,y1,x2,y2);
-#endif
-	SDL_Rect dst = {x1, y1, x2, y2};
-        SDL_SetAlpha (terminal->surface, SDL_SRCALPHA, 0);
-	SDL_BlitSurface (terminal->surface, &dst, scr, &dst);
-}
-
 int cursorx=1000;
 int cursory=1000;
 int cursorw=1000;
 int cursorh=1000;
 
-void TerminalCursor(int x,int y,int width,int height)
-{
+void omshell_TerminalCursor(int x,int y,int width,int height) {
 #ifdef DEBUG
 	printf("terminalcursor\n");
 #endif
@@ -160,7 +157,7 @@ void TerminalCursor(int x,int y,int width,int height)
 	if ((cursorx!=1000) && ((cursorx!=x1) || (cursory!=y1))) {
 		SDL_Rect dst2 = {cursorx, cursory, cursorw, cursorh};
 		SDL_BlitSurface(bg[layout*2], &dst2, scr, &dst2);
-		TerminalBlit (cursorx, cursory, cursorw, cursorh);
+		omshell_TerminalBlit (cursorx, cursory, cursorw, cursorh);
 		SDL_UpdateRect(scr,cursorx,cursory,cursorw,cursorh);
 	}
 
@@ -177,8 +174,7 @@ unsigned char extended_codes[32] = { 111, 72, 72, 70, 67, 76, 111, 43,
 				     124, 60, 62, 109, 61, 69, 46, 32 };
 
 
-void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int inverso, int extended)
-{
+void omshell_TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int inverso, int extended) {
 #ifdef DEBUG
 	printf("terminaldrawimagestring\n");
 #endif
@@ -223,7 +219,7 @@ void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int
 	SDL_Rect dst = {x1,y1 - terminal->glyph_size.h+2,x1 + len * terminal->glyph_size.w, y1};
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
-	TerminalBlit (x1,y1 - terminal->glyph_size.h+2,x1 + len * terminal->glyph_size.w, y1);
+	omshell_TerminalBlit (x1,y1 - terminal->glyph_size.h+2,x1 + len * terminal->glyph_size.w, y1);
 	SDL_UpdateRect(scr,x1,y1 - terminal->glyph_size.h+2, len * terminal->glyph_size.w, terminal->glyph_size.h+2);
 
 	if (inverso) {
@@ -237,8 +233,7 @@ void TerminalDrawImageString(int x,int y, unsigned char *str,int len, int b, int
 /*
 * Terminal_Clear_Area
 */
-void Terminal_Clear_Area(int x,int y,int width,int height)
-{
+void omshell_Terminal_Clear_Area(int x,int y,int width,int height) {
 #ifdef DEBUG
 	printf("terminalcleararea\n");
 #endif
@@ -256,7 +251,7 @@ void Terminal_Clear_Area(int x,int y,int width,int height)
 
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
-	TerminalBlit (x1, y1, w1, h1);
+	omshell_TerminalBlit (x1, y1, w1, h1);
 	SDL_UpdateRect(scr, x1, y1, w1, h1);
 }
 
@@ -264,9 +259,8 @@ void Terminal_Clear_Area(int x,int y,int width,int height)
 /*
 * Terminal_Copy_Area
 */
-void Terminal_Copy_Area(int src_x, int src_y, 
-		unsigned int width, unsigned height, int dest_x, int dest_y)
-{
+void omshell_Terminal_Copy_Area(int src_x, int src_y, 
+		unsigned int width, unsigned height, int dest_x, int dest_y) {
 #ifdef DEBUG
 	printf("terminalcopyarea\n");
 #endif
@@ -295,7 +289,7 @@ void Terminal_Copy_Area(int src_x, int src_y,
 	SDL_BlitSurface(bg[layout*2], &dst, scr, &dst);
 	Blitspecialkeycolors();
 
-	TerminalBlit (x2, y2+2, w1, h1);
+	omshell_TerminalBlit (x2, y2+2, w1, h1);
 
 	SDL_UpdateRect(scr, x2, y2+2, w1, h1);
 }
@@ -340,7 +334,7 @@ int tecleando = 10;
 int kn=0, kx=0, ky=0;
 int pulsado = 0;
 
-int check_ts(void) {
+int omshell_check_ts(void) {
 
 	int k=100; /* no key pressed */
 	SDL_Event evento;
@@ -573,12 +567,11 @@ static void Blitnormalkey(int k) {
 	SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
 
 	Blitspecialkeycolors();
-	TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
+	omshell_TerminalBlit(kb[layout][k][0], kb[layout][k][1], w, h);
 	SDL_UpdateRect(scr, kb[layout][k][0], kb[layout][k][1], w, h);
 }
 
-char *keyreleased()
-{
+char *omshell_keyreleased(void) {
 #ifdef DEBUG
 	printf("keyreleased\n");
 #endif
@@ -678,8 +671,7 @@ char *keyreleased()
 	return s;
 }
 
-void keypressed(int k)
-{
+void omshell_keypressed(int k) {
 #ifdef DEBUG
 	printf("keypressed\n");
 #endif

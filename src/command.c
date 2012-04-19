@@ -299,11 +299,11 @@ int flags;
 
 
 
-			k = check_ts();
+			k = omshell_check_ts();
 			if (k<100)
-				keypressed(k);
+				omshell_keypressed(k);
 			else if (k>100) {
-				letra=keyreleased();
+				letra = omshell_keyreleased();
 					if (((*letra) == 201) || ((*letra) == 202))
 						return (*letra);
 					else if ((*letra) != '\0')

@@ -215,9 +215,8 @@ And the next libraries :
 - SDL
 - SDL_Mixer
 - SDL_ttf
-- libexpect5.43.so
-- libtk8.4.so
-- libtcl8.4.so
+- SDL_image
+- util
 
 The original libSDL_terminal was modified. Commented the "ttfwasinit()" call
 because it gives an exception float when running.

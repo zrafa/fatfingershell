@@ -312,7 +312,8 @@ static void terminal_init(void) {
 	};
 
 	terminal =  SDL_CreateTerminal ();
-	SDL_TerminalSetFont (terminal, "./VeraMono.ttf", 12);
+	printf("Intentamos abrir la fuente\n");
+	SDL_TerminalSetFont (terminal, "VeraMono.ttf", 12);
 	SDL_TerminalSetSize (terminal, 80, 24);
 	SDL_TerminalSetPosition (terminal, 0, 0);
 
@@ -326,9 +327,9 @@ static void terminal_init(void) {
 	SDL_TerminalPrint (terminal, "Terminal initialized\n");
 }
 
-int tecleando = 10;
-int kn=0, kx=0, ky=0;
-int pulsado = 0;
+/* int tecleando = 10; */
+/* int kn=0, kx=0, ky=0; */
+/* int pulsado = 0; */
 
 int omshell_check_ts(void) {
 
@@ -341,15 +342,16 @@ int omshell_check_ts(void) {
 /* Para PC o tablets en general */
 
 	while ( SDL_PollEvent(&evento) ) {
-	 	   switch (evento.type){
-			case SDL_MOUSEBUTTONDOWN:
-				mb=SDL_GetMouseState(&mx, &my);
-				printf("X=%d___Y=%d\n",mx,my);
-				for (i=0; i<n; i++)
-					if ((mx >= kb[layout][i][0]) && (mx <= kb[layout][i][2]) && (my >= kb[layout][i][1]) && (my <= kb[layout][i][3])) {
-						k=i;
-						break;
-					};
+		switch (evento.type) {
+		case SDL_MOUSEBUTTONDOWN:
+
+			mb=SDL_GetMouseState(&mx, &my);
+			printf("X=%d___Y=%d\n",mx,my);
+			for (i=0; i<n; i++)
+				if ((mx >= kb[layout][i][0]) && (mx <= kb[layout][i][2]) && (my >= kb[layout][i][1]) && (my <= kb[layout][i][3])) {
+					k=i;
+					break;
+				};
 				/* to guess where user wanted to press we modify a bit the position
  				 * because if the finger was the fat finger of the left hand then 
 				 * it is very probable that the user wanted to press a bit more up
@@ -360,11 +362,11 @@ int omshell_check_ts(void) {
 				 * I modify the behavior just in the middle up, where the fat finger
 				 * must do an effort to press (and these are not in arrowhead position)
 				 */
-				break;
-			case SDL_MOUSEBUTTONUP:
-				k = 101;
-				break;
-			}
+			break;
+		case SDL_MOUSEBUTTONUP:
+			k = 101;
+			break;
+		}
 	}
 /* FIN Para PC o tablets en general */
 
@@ -403,23 +405,24 @@ int vibrar = 0;
 
 static void *vibration(void *arg) {
 
-	char *p = "170\n"; /* power of vibr */
-	char *p1 = "0\n"; /* power of vibr */
+	char *pow_on = "170\n"; /* power of vibr */
+	char *pow_off = "0\n"; /* power of vibr */
 	int us = 600000; /* usleep in milliseconds */
 
+	const char * vibr_fn = "/sys/class/leds/neo1973:vibrator/brightness";
 	FILE *f;
 
 	for(;;) {
 		if (vibrar) {
 
-			f = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
-			fprintf(f, "%s", p);
+			f = fopen(vibr_fn, "w");
+			fprintf(f, "%s", pow_on);
 			fclose(f);
 
 			usleep(us);
 
-			f = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
-			fprintf(f, "%s", p1);
+			f = fopen(vibr_fn, "w");
+			fprintf(f, "%s", pow_off);
 			fclose(f);
 			vibrar = 0;
 		}
@@ -450,6 +453,13 @@ static void *playsound(void *arg) {
 	}
 }
 
+static void print_usage(void) {
+
+	printf("usage: omshell [-v] [-s] [-f] \n\t \
+		-v : vibration \n\t \
+		-s : sound\n\t \
+		-d : dark background (black&white) (default: gray&black)\n");
+}
 
 static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 
@@ -458,10 +468,11 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 	*v=0;
 	*s=0;
 
+	/* [-v] [-s] [-f] -v : vibration -s : sound -d : dark background */
 	static const char *optstring = "dvsfh";
 	int opt = getopt(argc, argv, optstring);
 	
-	while(opt != -1) {
+	while (opt != -1) {
 		switch (opt) {
 			case 'd':
 				*dark = 1;  
@@ -473,7 +484,7 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 				*s = 1;  
 				break;                                
 			case 'h':
-				printf("usage: omshell [-v] [-s] [-f] \n\t -v : vibration \n\t -s : sound\n\t -d : dark background (black&white) (default: gray&black)\n");
+				print_usage();
 				exit(0);                                
 			default: break;
 		}                
@@ -481,7 +492,7 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 	}
 }
 
-SDL_Surface *load_image(const char *f) {
+static SDL_Surface *load_image(const char *f) {
 
 	SDL_Surface *s, *st;
 
@@ -531,17 +542,14 @@ static void load_sounds(void) {
 
 	printf("loading sounds..");
 
-	if (sound) {
-
-		load_sound(ks[0][0], "k1.wav");	/* key 1 pressed */ 
-		load_sound(ks[0][1], "k11.wav");	/* key 1 released */ 
-		load_sound(ks[1][0], "k2.wav");	/* key 2 pressed */ 
-		load_sound(ks[1][1], "k22.wav");	/* key 2 released */ 
-		load_sound(ks[2][0], "k3.wav");	/* key 3 pressed */ 
-		load_sound(ks[2][1], "k33.wav");	/* key 3 released */ 
-		load_sound(ks[3][0], "k4.wav");	/* key 4 pressed */ 
-		load_sound(ks[3][1], "k44.wav");	/* key 4 released */ 
-	}
+	load_sound(ks[0][0], "k1.wav");	/* key 1 pressed */ 
+	load_sound(ks[0][1], "k11.wav");	/* key 1 released */ 
+	load_sound(ks[1][0], "k2.wav");	/* key 2 pressed */ 
+	load_sound(ks[1][1], "k22.wav");	/* key 2 released */ 
+	load_sound(ks[2][0], "k3.wav");	/* key 3 pressed */ 
+	load_sound(ks[2][1], "k33.wav");	/* key 3 released */ 
+	load_sound(ks[3][0], "k4.wav");	/* key 4 pressed */ 
+	load_sound(ks[3][1], "k44.wav");	/* key 4 released */ 
 }
 
 

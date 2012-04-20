@@ -54,11 +54,8 @@ Mix_Chunk *ks[4][2];	/* key sounds, index 0 = pressed, index 1 = released
 int sound;
 int previouskey = 100; /* released */
 int layout=0;	/* current layout */
-
 SDL_Terminal *terminal;
 
-
-/* char buf[1024]; */
 
 int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground" 
 		 * loaded from : colors.cfg
@@ -87,7 +84,7 @@ void omshell_quit(int error)
 
 
 /* 544 393 xmax ymax */
-void getxy (int *x, int *y) {
+static void getxy (int *x, int *y) {
 	(*x) = (*x) * 640 / 544;
 	(*y) = (*y) * 458 / 393;
 }
@@ -443,7 +440,7 @@ static void *playsound(void *arg) {
 
 	for(;;) {
 
-		if (sound && play) {
+		if (play) {
 			if (ksound <= nkeys)
 				c = Mix_PlayChannel(-1, ks[((kb[layout][ksound][6])-1)][ktype], 0);
 			play = 0;

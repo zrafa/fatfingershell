@@ -31,9 +31,7 @@ char xvt_command_c_sccsid[] = "@(#)command.c	1.3 9/12/93 (UKC)";
 #else
 #include <varargs.h>
 #endif
-#include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/time.h>

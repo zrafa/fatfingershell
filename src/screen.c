@@ -30,9 +30,7 @@ char xvt_screen_c_sccsid[] = "@(#)screen.c	1.6 11/1/94 (UKC)";
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
-#include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/Xatom.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>

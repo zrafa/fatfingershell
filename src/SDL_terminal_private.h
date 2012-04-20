@@ -21,7 +21,6 @@
 */
 
 #include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
 #include <SDL/SDL_ttf.h>
 #include "SDL_terminal.h"
 

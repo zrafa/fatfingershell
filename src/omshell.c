@@ -1,5 +1,5 @@
 /*
- * FatFingerShell - a virtual terminal for Openmoko
+ * FatFingerShell - a virtual terminal for Openmoko (also tablets and phones)
  *
  * Copyright (C) 2009-2012 Rafael Ignacio Zurita <rizurita@yahoo.com>
  *
@@ -51,17 +51,14 @@ Mix_Chunk *ks[4][2];	/* key sounds, index 0 = pressed, index 1 = released
 			 * 4 key different sounds
 			 */
 
-int sound, vibracion;
-int darkbackground;
+int sound;
 int previouskey = 100; /* released */
 int layout=0;	/* current layout */
 
 SDL_Terminal *terminal;
 
 
-int fd;
-fd_set rset;
-char buf[1024];
+/* char buf[1024]; */
 
 int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground" 
 		 * loaded from : colors.cfg
@@ -73,9 +70,6 @@ void omshell_quit(int error)
 {
 	int i;
 
-	/* fd is the output of bash */
-	close (fd);
-
 	if (sound) {
 		for (i=0; i<4; i++) {
 			Mix_FreeChunk(ks[i][0]);
@@ -84,7 +78,7 @@ void omshell_quit(int error)
 		Mix_CloseAudio(); 
 	}
 
-	for (i=0; i<4; i++)
+	for (i=0; i<6; i++)
 		SDL_FreeSurface(bg[i]);
 
 	SDL_Quit();
@@ -100,7 +94,7 @@ void getxy (int *x, int *y) {
 
 static void omshell_terminalblit(int x1, int y1, int x2, int y2) {
 #ifdef DEBUG
-	printf("terminalblit x1=%i,y1=%i   x2=%i,y2=%i\n",x1,y1,x2,y2);
+	printf("terminalblit \n");
 #endif
 	SDL_Rect dst = {x1, y1, x2, y2};
         SDL_SetAlpha (terminal->surface, SDL_SRCALPHA, 0);
@@ -179,6 +173,9 @@ void omshell_terminaldrawimagestring(int x,int y, unsigned char *str,int len, in
 	SDL_Color bgc = terminal->bg_color;
 	SDL_Color fg2;
 
+	unsigned char linea[1024];
+	int i;
+
 	if (inverso) {
 		fg2.r = 255 - fg.r;
 		fg2.g = 255 - fg.g;
@@ -187,8 +184,6 @@ void omshell_terminaldrawimagestring(int x,int y, unsigned char *str,int len, in
 		terminal->bg_color = fg;
 	}
 
-	unsigned char linea[1024];
-	int i;
 	memcpy(linea, str, len);
 	linea[len] = '\0';
 
@@ -203,6 +198,7 @@ void omshell_terminaldrawimagestring(int x,int y, unsigned char *str,int len, in
 		if ( linea[i] > 31) {
 			if (extended && (linea[i]>95))
 				linea[i] = extended_codes[(linea[i]-96)];
+
 			SDL_TerminalRenderChar (terminal, 
 				x1 + i * terminal->glyph_size.w,
 				y1 - terminal->glyph_size.h +2,
@@ -239,7 +235,12 @@ void omshell_terminal_clear_area(int x,int y,int width,int height) {
 	int w1, h1;
 	w1=width; h1=height;
 	getxy(&w1,&h1);
-	Uint32 color = SDL_MapRGBA (terminal->surface->format, terminal->color.r, terminal->color.g, terminal->color.b, terminal->color.unused);
+
+	Uint32 color = SDL_MapRGBA (terminal->surface->format,
+					 terminal->color.r,
+					 terminal->color.g,
+					 terminal->color.b,
+					 terminal->color.unused);
 
 	SDL_SetAlpha (terminal->surface, 0, 0);
 	SDL_Rect dst = {x1, y1, w1, h1};
@@ -409,7 +410,7 @@ static void *vibration(void *arg) {
 	FILE *f;
 
 	for(;;) {
-		if (vibracion && vibrar) {
+		if (vibrar) {
 
 			f = fopen("/sys/class/leds/neo1973:vibrator/brightness", "w");
 			fprintf(f, "%s", p);
@@ -500,7 +501,7 @@ SDL_Surface *load_image(const char *f) {
 	return s;
 }
 
-static void load_images(void) {
+static void load_images(int darkbackground) {
 
 	if (darkbackground) {
 		bg[0] = load_image("layout-k.bmp.png");	/* normal keyboard */
@@ -716,6 +717,8 @@ static void load_kb_layout(int l, int n, const char *fn) {
 
 void omshell_main(int argc, char * argv[]) {
 
+	int darkbackground, vibracion;
+
 	options(&darkbackground, &vibracion, &sound, argc, argv);
 
 	load_kb_layout(0,nkeys,"keyboard.cfg");		/* load key codes */
@@ -739,7 +742,6 @@ void omshell_main(int argc, char * argv[]) {
 	if (sound) {
 		if (Mix_OpenAudio(8000, AUDIO_U8, 1, 1024) < 0) {
 			fprintf(stderr, "Warning: Audio could not be setup \nReason: %s\n", SDL_GetError());
-			/* exit(1); */
 			sound = 0;
 		}
 	}
@@ -747,7 +749,7 @@ void omshell_main(int argc, char * argv[]) {
 	if (sound)
 		load_sounds();
 
-	load_images();
+	load_images(darkbackground);
 	terminal_init();
 
 	/* Iniciamos los threads para el sonido y la vibracion */

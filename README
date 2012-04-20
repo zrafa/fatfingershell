@@ -61,7 +61,7 @@ fatfingershell -e /bin/bash
 Install on Openmoko Freerunner
 ------------------------------
 
-opkg install http://ffs.projects.openmoko.org/fatfingershell_0.2_armv4t.ipk 
+opkg install http://fz.hobby-site.org/om/fatfingershell/fatfingershell_0.2_armv4t.ipk
 
 Just tap in the fatfingershell icon. Or run /usr/bin/fatfingershell.sh
 

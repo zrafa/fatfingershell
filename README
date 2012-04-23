@@ -47,15 +47,16 @@ Building from sources
 cd src/
 make
 
+
 Install on PC
 -------------
 
 copy fatfingershell binary to /usr/bin/ or your prefered bin directory.
-copy share/ directory whereever you want.
+copy fonts/* share/
+copy share/ directory whereever you want
 
 Run fatfingershell with :
-cd /path/to/share/
-fatfingershell -e /bin/bash
+fatfingershell -d share/ -e /bin/bash
 
 
 Install on Openmoko Freerunner

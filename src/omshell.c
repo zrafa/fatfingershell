@@ -730,16 +730,24 @@ static void load_kb_layout(int l, int n, const char *fn) {
 void omshell_main(int argc, char * argv[]) {
 
 	char *olddir;
-	int darkbackground, vibracion;
+	char homedatadir[1024];
+	char *homedir = getenv ("HOME");
+
+	int darkbackground, vibracion, err;
 
 	options(&darkbackground, &vibracion, &sound, argc, argv);
 
 	olddir = getcwd(NULL, 0);
 	printf("olddir : %s\n", olddir);
 
+	sprintf(homedatadir, "%s/.fatfingershell/", homedir);
+ 	if (chdir(homedatadir) == -1)
+		printf("No hay directorio cfg eh home : %s\n", homedatadir);
+
 	if (datadir != NULL) {
 		printf("datadir : %s\n", datadir);
-		chdir(datadir);
+		if (chdir(datadir) == -1)
+			printf("Error al abrir el directorio cfg\n");
 	}
 
 	load_kb_layout(0,nkeys,"keyboard.cfg");		/* load key codes */

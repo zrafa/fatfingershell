@@ -603,7 +603,6 @@ run_command(command,argv)
 char *command;
 char **argv;
 {
-	printf("estamos por ejec command\n");
 	int ptyfd, ttyfd;
 	int uid, gid;
 	int i;
@@ -673,7 +672,6 @@ char **argv;
 	}
 	signal(SIGCHLD,catch_child);
 	write_utmp();
-	printf("estamos por ejec command 2\n");
 	return(ptyfd);
 }
 

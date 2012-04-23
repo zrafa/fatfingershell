@@ -730,7 +730,7 @@ static void load_kb_layout(int l, int n, const char *fn) {
 void omshell_main(int argc, char * argv[]) {
 
 	char *olddir;
-	char homedatadir[1024];
+	char default_dir[1024];	/* default data cfg dir */
 	char *homedir = getenv ("HOME");
 
 	int darkbackground, vibracion, err;
@@ -740,9 +740,17 @@ void omshell_main(int argc, char * argv[]) {
 	olddir = getcwd(NULL, 0);
 	printf("olddir : %s\n", olddir);
 
-	sprintf(homedatadir, "%s/.fatfingershell/", homedir);
- 	if (chdir(homedatadir) == -1)
-		printf("No hay directorio cfg eh home : %s\n", homedatadir);
+	sprintf(default_dir, "/usr/local/share/fatfingershell/", default_dir);
+ 	if (chdir(default_dir) == -1)
+		printf("No hay directorio cfg eh local : %s\n", default_dir);
+
+	sprintf(default_dir, "/usr/share/fatfingershell/", default_dir);
+ 	if (chdir(default_dir) == -1)
+		printf("No hay directorio cfg eh usr : %s\n", default_dir);
+
+	sprintf(default_dir, "%s/.fatfingershell/", homedir);
+ 	if (chdir(default_dir) == -1)
+		printf("No hay directorio cfg eh home : %s\n", default_dir);
 
 	if (datadir != NULL) {
 		printf("datadir : %s\n", datadir);

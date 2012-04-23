@@ -452,11 +452,14 @@ static void *playsound(void *arg) {
 
 static void print_usage(void) {
 
-	printf("usage: omshell [-v] [-s] [-f] \n\t \
+	printf("usage: omshell [-v] [-s] [-i] [-d dir] \n\t \
 		-v : vibration \n\t \
 		-s : sound\n\t \
-		-d : dark background (black&white) (default: gray&black)\n");
+		-i : dark background (black&white) (default: gray&black)\n\t \
+		-d dir : specify dir as data directory \n");
 }
+
+char *datadir = NULL;
 
 static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 
@@ -465,13 +468,17 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 	*v=0;
 	*s=0;
 
-	/* [-v] [-s] [-f] -v : vibration -s : sound -d : dark background */
-	static const char *optstring = "dvsfh";
+	static const char *optstring = "d:vsih";
 	int opt = getopt(argc, argv, optstring);
 	
 	while (opt != -1) {
 		switch (opt) {
 			case 'd':
+				printf("datadir %s \n", optarg);
+				datadir = optarg;
+				printf("datadir %s \n", optarg);
+				break;
+			case 'i':
 				*dark = 1;  
 				break;                                
 			case 'v':
@@ -722,9 +729,18 @@ static void load_kb_layout(int l, int n, const char *fn) {
 
 void omshell_main(int argc, char * argv[]) {
 
+	char *olddir;
 	int darkbackground, vibracion;
 
 	options(&darkbackground, &vibracion, &sound, argc, argv);
+
+	olddir = getcwd(NULL, 0);
+	printf("olddir : %s\n", olddir);
+
+	if (datadir != NULL) {
+		printf("datadir : %s\n", datadir);
+		chdir(datadir);
+	}
 
 	load_kb_layout(0,nkeys,"keyboard.cfg");		/* load key codes */
 	load_kb_layout(1,nkeys,"keyboard2.cfg");	/* load key codes */
@@ -778,4 +794,8 @@ void omshell_main(int argc, char * argv[]) {
 	Blitspecialkeycolors();
 	SDL_TerminalBlit (terminal);
 	SDL_Flip(scr);
+
+	printf("olddir : %s\n", olddir);
+	chdir(olddir);
+	free(olddir);
 }

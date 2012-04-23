@@ -346,10 +346,12 @@ int omshell_check_ts(void) {
 
 	while ( SDL_PollEvent(&evento) ) {
 		switch (evento.type) {
+		case SDL_QUIT:
+			omshell_quit(0);
+
 		case SDL_MOUSEBUTTONDOWN:
 
 			mb=SDL_GetMouseState(&mx, &my);
-			printf("X=%d___Y=%d\n",mx,my);
 			for (i=0; i<n; i++)
 				if ((mx >= kb[layout][i][0]) && (mx <= kb[layout][i][2]) && (my >= kb[layout][i][1]) && (my <= kb[layout][i][3])) {
 					k=i;
@@ -569,6 +571,9 @@ static void Blitnormalkey(int k) {
 	printf("blitnormalkey\n");
 #endif
 	int h, w;
+
+	if ((k>=nkeys) || (k<0))
+		return;
 
 	h = kb[layout][k][3] - kb[layout][k][1];
 	w = kb[layout][k][2] - kb[layout][k][0];

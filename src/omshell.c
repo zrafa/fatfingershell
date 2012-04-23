@@ -292,6 +292,7 @@ void omshell_terminal_copy_area(int src_x, int src_y,
 static void terminal_init(void) {
 	FILE *f;
 	int i;
+	struct stat *st = malloc(sizeof(struct stat));
 
 	f=fopen("colors.cfg","r");
 	if (f == NULL) {
@@ -310,7 +311,12 @@ static void terminal_init(void) {
 
 	terminal =  SDL_CreateTerminal ();
 	printf("Intentamos abrir la fuente\n");
-	SDL_TerminalSetFont (terminal, "VeraMono.ttf", 12);
+	if (lstat("VeraMono.ttf", st) == 0)
+		SDL_TerminalSetFont (terminal, "VeraMono.ttf", 12);
+	/* Intentamos ahora abrir la fuente de Debian */
+	else if (lstat("/usr/share/fonts/truetype/ttf-bitstream-vera/VeraMono.ttf", st) == 0)
+		SDL_TerminalSetFont (terminal, "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraMono.ttf", 12);
+
 	SDL_TerminalSetSize (terminal, 80, 24);
 	SDL_TerminalSetPosition (terminal, 0, 0);
 

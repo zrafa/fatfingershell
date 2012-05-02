@@ -2,9 +2,9 @@ SHELL = /bin/sh
 
 # CC = arm-angstrom-linux-gnueabi-gcc -O2
 
-CFLAGS = -Wall -DLINUX -g
-INCLUDES = -I/usr/include -I/usr/include/SDL
-LIBFLAGS = -lutil -lSDL-1.2 -lSDL_mixer-1.2 -lSDL_ttf-2.0 -lSDL_image
+CFLAGS = -Wall -DLINUX
+INCLUDES = -I/usr/include/SDL
+LIBFLAGS = -lutil -lSDL -lSDL_mixer -lSDL_ttf -lSDL_image
 
 BINDIR = /usr/local/bin
 DATADIR = /usr/local/share/fatfingershell

@@ -12,6 +12,7 @@ other Linux devices with just touchscreen.
   License as published by the Free Software Foundation;
   version 2 of the License.
 
+Check how it looks at : http://fz.hobby-site.org/om/fatfingershell/
 
 Features
 --------
@@ -25,7 +26,6 @@ Features
  - scroll
  - most used shell/vi keys are on the first layout
  
-
 It is possible to set colors and transparency, set new keyboard layouts
 (hard yet) and replace the sounds.
 

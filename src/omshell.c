@@ -63,6 +63,9 @@ int cs[2][4]; 	/* colors: two set of colors, for "setcolor" and "foreground"
 		 */
 
 
+char *datadir = NULL;
+char *colors_file = NULL;
+
 void omshell_quit(int error)
 {
 	int i;
@@ -294,7 +297,11 @@ static void terminal_init(void) {
 	int i;
 	struct stat *st = malloc(sizeof(struct stat));
 
-	f=fopen("colors.cfg","r");
+	if (colors_file != NULL)
+		f=fopen(colors_file,"r");
+	else
+		f=fopen("colors.cfg","r");
+
 	if (f == NULL) {
 		printf("error fopen\n");
 		exit(1);
@@ -460,14 +467,13 @@ static void *playsound(void *arg) {
 
 static void print_usage(void) {
 
-	printf("usage: omshell [-v] [-s] [-i] [-d dir] \n\t \
-		-v : vibration \n\t \
-		-s : sound\n\t \
-		-i : dark background (black&white) (default: gray&black)\n\t \
+	printf("usage: omshell [-v] [-s] [-i] [-c file] [-d dir] \n \
+		-v : vibration \n \
+		-s : sound\n \
+		-i : dark background (black&white) (default: gray&black)\n \
+		-c file : specify file as colors configuration file (default: colors.cfg)\n \
 		-d dir : specify dir as data directory \n");
 }
-
-char *datadir = NULL;
 
 static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 
@@ -476,11 +482,15 @@ static void options(int *dark, int *v, int *s, int argc, char * argv[]) {
 	*v=0;
 	*s=0;
 
-	static const char *optstring = "d:vsih";
+	static const char *optstring = "c:d:vsih";
 	int opt = getopt(argc, argv, optstring);
 	
 	while (opt != -1) {
 		switch (opt) {
+			case 'c':
+				colors_file = optarg;
+				printf("colors conf file %s \n", colors_file);
+				break;
 			case 'd':
 				printf("datadir %s \n", optarg);
 				datadir = optarg;
@@ -565,7 +575,7 @@ static void load_sounds(void) {
 }
 
 
-static void Blitnormalkey(int k) {
+static void Blitkey(int k, int normal) {
 
 #ifdef DEBUG
 	printf("blitnormalkey\n");
@@ -581,7 +591,10 @@ static void Blitnormalkey(int k) {
 	SDL_Rect orig = {kb[layout][k][0], kb[layout][k][1], w, h};
 	SDL_Rect dest = {kb[layout][k][0], kb[layout][k][1], w, h};
 
-	SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
+	if (normal)
+		SDL_BlitSurface(bg[layout*2], &orig, scr, &dest);
+	else
+		SDL_BlitSurface(bg[layout*2+1], &orig, scr, &dest);
 
 	Blitspecialkeycolors();
 	omshell_terminalblit(kb[layout][k][0], kb[layout][k][1], w, h);
@@ -656,7 +669,7 @@ char *omshell_keyreleased(void) {
 
 				if (kb[layout][i][7] == 1) {
 					kb[layout][i][7] = 0;
-					Blitnormalkey(i);
+					Blitkey(i, 1);
 				}
 			} else if ((kb[layout][i][4] == 99) && (kb[layout][i][5] == 99)) { /* CTRL key , s=99 ascii*/ 
 				if (kb[layout][i][7]) {
@@ -673,7 +686,7 @@ char *omshell_keyreleased(void) {
 					}
 
 					kb[layout][i][7] = 0;
-					Blitnormalkey(i);
+					Blitkey(i, 1);
 				}
 			}
 					
@@ -684,7 +697,7 @@ char *omshell_keyreleased(void) {
 	                	letra=kb[layout][k][4];
         }
 
-	Blitnormalkey(k);
+	Blitkey(k, 1);
 	
 	sprintf(s,"%c",letra);
 	return s;
@@ -702,8 +715,10 @@ void omshell_keypressed(int k) {
 		vibrar = 1;
 	}
 
-	if (previouskey != k)
-		Blitnormalkey(previouskey);
+	if (k != previouskey) {
+		Blitkey(k, 0);
+		Blitkey(previouskey, 1);
+	}
 	
 	previouskey = k;
 }
@@ -744,18 +759,19 @@ void omshell_main(int argc, char * argv[]) {
 	char default_dir[1024];	/* default data cfg dir */
 	char *homedir = getenv ("HOME");
 
-	int darkbackground, vibracion, err;
-
+	int darkbackground, vibracion;
 	options(&darkbackground, &vibracion, &sound, argc, argv);
 
 	olddir = getcwd(NULL, 0);
 	printf("olddir : %s\n", olddir);
 
-	sprintf(default_dir, "/usr/local/share/fatfingershell/", default_dir);
+	sprintf(default_dir, "/usr/local/share/fatfingershell/");
+	// sprintf(default_dir, "/usr/local/share/fatfingershell/", default_dir);
  	if (chdir(default_dir) == -1)
 		printf("No hay directorio cfg eh local : %s\n", default_dir);
 
-	sprintf(default_dir, "/usr/share/fatfingershell/", default_dir);
+	// sprintf(default_dir, "/usr/share/fatfingershell/", default_dir);
+	sprintf(default_dir, "/usr/share/fatfingershell/");
  	if (chdir(default_dir) == -1)
 		printf("No hay directorio cfg eh usr : %s\n", default_dir);
 

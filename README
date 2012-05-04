@@ -4,34 +4,34 @@ FatFingerShell virtual terminal
 FatFingerShell is a terminal emulator for tablets, phones and
 other Linux devices with just touchscreen.
 
-
 2009-2012 - Rafael Ignacio Zurita <rafaelignacio.zurita at gmail.com>
 
-  FatFingerShell is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation;
-  version 2 of the License.
+  FatFingerShell is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
 Check how it looks at : http://fz.hobby-site.org/om/fatfingershell/
 
 Features
 --------
 
- - fullscreen keyboard for bash/vi and other console tools
- - big keys
- - sound, screen and vibration feedback for keys pressed
- - color settings for layers (edit colors.cfg)
- - configuration files for keyboard layouts (so users can 
-   set their own layouts)
- - scroll
- - most used shell/vi keys are on the first layout
- 
+Features include :
+
+  - full on screen keyboard
+  - big keys
+  - sound, screen and vibration feedback
+  - color settings for layers
+  - configuration files for keyboard layouts
+  - scroll
+  - most used shell/vi keys are on the first layout
+
 It is possible to set colors and transparency, set new keyboard layouts
 (hard yet) and replace the sounds.
 
 The fullscreen keyboard aims to be useful for bash, vi and common console
-tools, like top, mocp, mplayer, mc, gnu tools, etc. The idea is to be
-comfortable for fat fingers.
+tools, like top, mocp, mplayer, mc, GNU tools, etc. The idea is to be
+comfortable for fat fingers on devices without a real keyboard.
 
 Also, having easy-to-use scripts for calling or sms, would do fatfingershell
 useful for all the phone functions device provides.

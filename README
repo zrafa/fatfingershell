@@ -221,3 +221,8 @@ And the next libraries :
 
 The original libSDL_terminal was modified. Commented the "ttfwasinit()" call
 because it gives an exception float when running.
+
+
+
+
+Modificado
